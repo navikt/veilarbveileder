@@ -1,6 +1,7 @@
 package no.nav.fo.provider.rest;
 
 import io.swagger.annotations.Api;
+import io.vavr.control.Try;
 import no.nav.fo.PortefoljeEnhet;
 import no.nav.fo.VeiledereResponse;
 import no.nav.fo.service.OrganisasjonEnhetV2Service;
@@ -34,6 +35,15 @@ public class EnhetController {
     @Path("/{enhetId}/navn")
     public PortefoljeEnhet hentNavn(@PathParam("enhetId") String enhetId) {
         return organisasjonEnhetV2Service.hentEnhet(enhetId).orElse(null);
+    }
+
+    @GET
+    @Path("/{enhetId}/tilgangTilEnhet")
+    public boolean hentTilgangTilEnhet(@PathParam("enhetId") String enhetId) {
+        return Try.runRunnable(() -> {
+            TilgangsRegler.tilgangTilOppfolging(pepClient);
+            TilgangsRegler.tilgangTilEnhet(pepClient, enhetId);
+        }).isSuccess();
     }
 
     @GET
