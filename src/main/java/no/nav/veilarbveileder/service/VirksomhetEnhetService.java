@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static no.nav.veilarbveileder.service.AuthService.ROLLE_MODIA_ADMIN;
 import static no.nav.veilarbveileder.utils.Mappers.tilPortefoljeEnhet;
+import static no.nav.veilarbveileder.utils.Mappers.tilVeilederInfo;
 
 @Slf4j
 @Service
@@ -53,7 +54,7 @@ public class VirksomhetEnhetService {
         Veileder veileder = hentVeilederData(navIdent);
         List<PortefoljeEnhet> portefoljeEnheter = hentEnhetListe(navIdent);
 
-        VeilederInfo veilederInfo = new VeilederInfo(veileder, portefoljeEnheter);
+        VeilederInfo veilederInfo = tilVeilederInfo(veileder, portefoljeEnheter);
 
         if (harModiaAdminRolle) {
             log.info("Rollen {} ble brukt for ident: {}", ROLLE_MODIA_ADMIN, navIdent);
