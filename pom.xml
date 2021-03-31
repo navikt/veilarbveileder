@@ -20,6 +20,7 @@
     <properties>
         <java.version>11</java.version>
         <common.version>2.2020.10.13_14.48-80e4c2dc5856</common.version>
+        <common.version2>2.2021.03.30_14.19-870b4385e980</common.version2>
         <springfox.version>2.9.2</springfox.version>
     </properties>
 
@@ -91,7 +92,7 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>client</artifactId>
-            <version>${common.version}</version>
+            <version>${common.version2}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>

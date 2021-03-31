@@ -15,27 +15,6 @@ import static org.mockito.Mockito.when;
 
 public class MappersTest {
 
-    @Test
-    public void skalMappeRessursListeResponsTilVeiledereResponsKorrekt() {
-        no.nav.virksomhet.organisering.enhetogressurs.v1.Enhet enhet = createEnhet("9999", "NAV Aremark");
-        Ressurs ressurs = createRessurs();
-        Ressurs anotherRessurs = createAnotherRessurs();
-        List<Ressurs> ressursListe = new ArrayList<>();
-        ressursListe.add(ressurs);
-        ressursListe.add(anotherRessurs);
-        WSHentRessursListeResponse wsHentRessursListeResponse = mock(WSHentRessursListeResponse.class);
-        when(wsHentRessursListeResponse.getEnhet()).thenReturn(enhet);
-        when(wsHentRessursListeResponse.getRessursListe()).thenReturn(ressursListe);
-
-        VeiledereResponse veiledereResponse = Mappers.ressursResponseTilVeilederResponse(wsHentRessursListeResponse);
-
-        assertThat(veiledereResponse.getEnhet().getEnhetId().get()).isEqualTo(enhet.getEnhetId());
-        assertThat(veiledereResponse.getEnhet().getNavn()).isEqualTo(enhet.getNavn());
-        assertThat(veiledereResponse.getVeilederListe().get(0).getNavn()).isEqualTo(ressurs.getNavn());
-        assertThat(veiledereResponse.getVeilederListe().get(0).getEtternavn()).isEqualTo(ressurs.getEtternavn());
-        assertThat(veiledereResponse.getVeilederListe().get(1).getFornavn()).isEqualTo(anotherRessurs.getFornavn());
-        assertThat(veiledereResponse.getVeilederListe().get(1).getIdent()).isEqualTo(anotherRessurs.getRessursId());
-    }
 
     private Enhet createEnhet(String enhetId, String navn) {
         no.nav.virksomhet.organisering.enhetogressurs.v1.Enhet enhet = mock(no.nav.virksomhet.organisering.enhetogressurs.v1.Enhet.class);
