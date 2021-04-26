@@ -32,6 +32,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.function.Supplier;
 
+import static no.nav.common.utils.UrlUtils.createProdInternalIngressUrl;
 import static no.nav.veilarbveileder.utils.ServiceUserUtils.getServiceUserCredentials;
 
 @Slf4j
@@ -53,7 +54,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public AxsysClient axsysClient(){
+    public AxsysClient axsysClient() {
         String url = UrlUtils.createServiceUrl("axsys", "org", false);
         return new CachedAxsysClient(new AxsysClientImpl(url));
     }
@@ -97,7 +98,7 @@ public class ApplicationConfig {
         Supplier<String> serviceTokenSupplier = () -> serviceToServiceTokenProvider()
                 .getServiceToken("nom-api", "nom", "prod-gcp");
 
-        return new CachedNomClient(new NomClientImpl("https://nom-api.intern.nav.no", serviceTokenSupplier));
+        return new CachedNomClient(new NomClientImpl(createProdInternalIngressUrl("nom-api"), serviceTokenSupplier));
     }
 
 }
