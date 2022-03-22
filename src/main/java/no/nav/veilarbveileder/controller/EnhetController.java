@@ -49,7 +49,6 @@ public class EnhetController {
     @GetMapping("/{enhetId}/veiledere")
     public VeiledereResponse hentRessurser(@PathVariable("enhetId") EnhetId enhetId) {
         authService.sjekkTilgangTilModia();
-        authService.sjekkVeilederTilgangTilEnhet(enhetId);
 
         return veilederOgEnhetService.hentRessursListe(enhetId);
     }
