@@ -44,6 +44,14 @@ spec:
   azure:
     application:
       enabled: true
+      claims:
+        extra:
+          - "NAVident"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: paw-proxy
+          namespace: paw
   envFrom:
     - configmap: pto-config
   env:
