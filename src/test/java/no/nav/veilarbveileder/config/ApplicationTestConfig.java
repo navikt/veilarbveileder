@@ -2,8 +2,10 @@ package no.nav.veilarbveileder.config;
 
 import no.nav.common.abac.AbacClient;
 import no.nav.common.abac.VeilarbPep;
+import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.veilarbveileder.mock.AbacClientMock;
 import no.nav.veilarbveileder.mock.VeilarbPepMock;
+import no.nav.veilarbveileder.service.VeilederOgEnhetServiceV2;
 import no.nav.veilarbveileder.utils.ModiaPep;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,11 +16,11 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @EnableConfigurationProperties({EnvironmentProperties.class})
 @Import({
-        SwaggerConfig.class,
         ClientTestConfig.class,
         ControllerTestConfig.class,
         ServiceTestConfig.class,
-        FilterTestConfig.class
+        FilterTestConfig.class,
+        VeilederOgEnhetServiceV2.class,
 })
 public class ApplicationTestConfig {
 
