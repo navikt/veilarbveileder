@@ -20,7 +20,7 @@
     <properties>
         <java.version>11</java.version>
         <common.version>2.2022.04.01_08.27-cbfeb0be0ee0</common.version>
-        <springfox.version>3.0.0</springfox.version>
+        <springfox.version>2.9.2</springfox.version>
     </properties>
 
     <build>
@@ -65,14 +65,9 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${springfox.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.6.6</version>
         </dependency>
 
         <!-- Common Dependencies -->
