@@ -29,7 +29,7 @@ import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
 import no.nav.veilarbveileder.client.LdapClient;
 import no.nav.veilarbveileder.client.LdapClientImpl;
-import no.nav.veilarbveileder.utils.DevNomClient;
+import no.nav.veilarbveileder.utils.NomBackupClient;
 import no.nav.veilarbveileder.utils.ModiaPep;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -118,7 +118,7 @@ public class ApplicationConfig {
     @Bean
     public NomClient nomClient() {
         if (EnvironmentUtils.isDevelopment().orElse(false)) {
-            return new DevNomClient();
+            return new NomBackupClient();
         }
 
         Supplier<String> serviceTokenSupplier = () -> serviceToServiceTokenProvider()
