@@ -1,5 +1,6 @@
 package no.nav.veilarbveileder.config;
 
+import no.nav.common.client.norg2.Enhet;
 import no.nav.common.client.norg2.Norg2Client;
 import no.nav.common.health.HealthCheckResult;
 import no.nav.common.types.identer.NavIdent;
@@ -27,7 +28,7 @@ public class ClientTestConfig {
             }
 
             @Override
-            public no.nav.common.client.norg2.Enhet hentTilhorendeEnhet(String s) {
+            public Enhet hentTilhorendeEnhet(String s, Diskresjonskode diskresjonskode, boolean b) {
                 return null;
             }
 
