@@ -53,8 +53,8 @@ spec:
       rules:
         - application: paw-proxy
           namespace: paw
-        - application: veilarbapi
-          namespace: pto
+        - application: veilarbportefoljeflatefs
+          namespace: obo
           cluster: dev-gcp
   envFrom:
     - configmap: pto-config
