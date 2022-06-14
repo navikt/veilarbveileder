@@ -53,7 +53,7 @@ spec:
           namespace: paw
         - application: veilarbapi
           namespace: pto
-          cluster: dev-gcp
+          cluster: prod-gcp
   envFrom:
     - configmap: pto-config
   env:
