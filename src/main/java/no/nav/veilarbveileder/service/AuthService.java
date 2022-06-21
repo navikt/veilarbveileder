@@ -6,6 +6,8 @@ import no.nav.common.abac.VeilarbPep;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.common.types.identer.NavIdent;
+import no.nav.poao_tilgang.client.Decision;
+import no.nav.poao_tilgang.client.TilgangClient;
 import no.nav.veilarbveileder.client.LdapClient;
 import no.nav.veilarbveileder.utils.ModiaPep;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,8 @@ public class AuthService {
     private final AuthContextHolder authContextHolder;
 
     private final VeilarbPep veilarbPep;
+
+    private final TilgangClient tilgangClient;
 
     private final ModiaPep modiaPep;
 
@@ -46,7 +50,17 @@ public class AuthService {
     }
 
     public void sjekkTilgangTilModia() {
-        if (!modiaPep.harVeilederTilgangTilModia(getInnloggetBrukerToken())) {
+        boolean harTilgang = modiaPep.harVeilederTilgangTilModia(getInnloggetBrukerToken());
+        try {
+            Decision decisionPoaoTilgang = tilgangClient.harVeilederTilgangTilModia(getInnloggetVeilederIdent().get());
+            boolean harTilgangPoaoTilgang =  Decision.Type.PERMIT.equals(decisionPoaoTilgang.getType());
+            if (harTilgang != harTilgangPoaoTilgang) {
+                log.warn("Forskjellig resultat fra poao-tilgang og abac-modia");
+            }
+        } catch (Exception e) {
+            log.error("Kall til poao-tilgang feilet", e);
+        }
+        if (!harTilgang) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia");
         }
     }
