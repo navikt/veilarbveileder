@@ -108,7 +108,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    TilgangClient tilgangClient(AzureAdMachineToMachineTokenClient tokenClient) {
+    public TilgangClient tilgangClient(AzureAdMachineToMachineTokenClient tokenClient) {
         String url = isProduction() ?
                 createProdInternalIngressUrl("poao-tilgang") :
                 createDevInternalIngressUrl("poao-tilgang");
