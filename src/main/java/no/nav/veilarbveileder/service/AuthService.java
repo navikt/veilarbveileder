@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.abac.VeilarbPep;
 import no.nav.common.auth.context.AuthContextHolder;
+import no.nav.common.featuretoggle.UnleashClient;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.common.types.identer.NavIdent;
 import no.nav.poao_tilgang.client.Decision;
@@ -29,6 +30,8 @@ public class AuthService {
 
     private final LdapClient ldapClient;
 
+    private final UnleashClient unleashClient;
+
     public static final String ROLLE_MODIA_ADMIN = "0000-GA-Modia_Admin";
 
     public NavIdent getInnloggetVeilederIdent() {
@@ -51,14 +54,16 @@ public class AuthService {
 
     public void sjekkTilgangTilModia() {
         boolean harTilgang = modiaPep.harVeilederTilgangTilModia(getInnloggetBrukerToken());
-        try {
-            Decision decisionPoaoTilgang = tilgangClient.harVeilederTilgangTilModia(getInnloggetVeilederIdent().get());
-            boolean harTilgangPoaoTilgang =  Decision.Type.PERMIT.equals(decisionPoaoTilgang.getType());
-            if (harTilgang != harTilgangPoaoTilgang) {
-                log.warn("Forskjellig resultat fra poao-tilgang og abac-modia");
+        if (unleashClient.isEnabled("veilarbveileder.poao-tilgang.sammenligne")) {
+            try {
+                Decision decisionPoaoTilgang = tilgangClient.harVeilederTilgangTilModia(getInnloggetVeilederIdent().get());
+                boolean harTilgangPoaoTilgang = Decision.Type.PERMIT.equals(decisionPoaoTilgang.getType());
+                if (harTilgang != harTilgangPoaoTilgang) {
+                    log.warn("Forskjellig resultat fra poao-tilgang og abac-modia");
+                }
+            } catch (Exception e) {
+                log.error("Kall til poao-tilgang feilet", e);
             }
-        } catch (Exception e) {
-            log.error("Kall til poao-tilgang feilet", e);
         }
         if (!harTilgang) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia");
