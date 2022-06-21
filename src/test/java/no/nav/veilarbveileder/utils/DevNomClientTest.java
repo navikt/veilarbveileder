@@ -2,12 +2,11 @@ package no.nav.veilarbveileder.utils;
 
 import no.nav.common.client.nom.VeilederNavn;
 import no.nav.common.types.identer.NavIdent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DevNomClientTest {
 
