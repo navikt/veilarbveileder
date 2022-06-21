@@ -2,7 +2,7 @@ name: Build, push and deploy
 on: push
 env:
   IMAGE_TAG: ${{ github.sha }}
-  IMAGE: docker.pkg.github.com/${{ github.repository }}/veilarbveileder
+  IMAGE: ghcr.io/${{ github.repository }}/veilarbveileder
   PRINT_PAYLOAD: true
 jobs:
   test:
