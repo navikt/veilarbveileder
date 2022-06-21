@@ -20,13 +20,18 @@ import no.nav.common.client.norg2.Norg2Client;
 import no.nav.common.client.norg2.NorgHttp2Client;
 import no.nav.common.featuretoggle.UnleashClient;
 import no.nav.common.featuretoggle.UnleashClientImpl;
+import no.nav.common.rest.client.RestClient;
 import no.nav.common.sts.ServiceToServiceTokenProvider;
 import no.nav.common.sts.utils.AzureAdServiceTokenProviderBuilder;
+import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
+import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.common.types.identer.NavIdent;
 import no.nav.common.utils.Credentials;
 import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
+import no.nav.poao_tilgang.client.TilgangClient;
+import no.nav.poao_tilgang.client.TilgangHttpClient;
 import no.nav.veilarbveileder.client.LdapClient;
 import no.nav.veilarbveileder.client.LdapClientImpl;
 import no.nav.veilarbveileder.utils.DevNomClient;
@@ -40,6 +45,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import static no.nav.common.utils.UrlUtils.createDevInternalIngressUrl;
+import static no.nav.common.utils.UrlUtils.createProdInternalIngressUrl;
 import static no.nav.veilarbveileder.utils.ServiceUserUtils.getServiceUserCredentials;
 
 @Slf4j
@@ -53,6 +60,13 @@ public class ApplicationConfig {
     @Bean
     public Credentials credentials() {
         return getServiceUserCredentials();
+    }
+
+    @Bean
+    public AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient() {
+        return AzureAdTokenClientBuilder.builder()
+                .withNaisDefaults()
+                .buildMachineToMachineTokenClient();
     }
 
     @Bean
@@ -94,6 +108,24 @@ public class ApplicationConfig {
     }
 
     @Bean
+    TilgangClient tilgangClient(AzureAdMachineToMachineTokenClient tokenClient) {
+        String url = isProduction() ?
+                createProdInternalIngressUrl("poao-tilgang") :
+                createDevInternalIngressUrl("poao-tilgang");
+
+        String tokenScope = String.format("api://%s-gcp.poao.poao-tilgang/.default", isProduction() ? "prod" : "dev");
+
+        return new TilgangHttpClient(
+                url,
+                () -> tokenClient.createMachineToMachineToken(tokenScope),
+                RestClient.baseClientBuilder()
+                        .connectTimeout(2, TimeUnit.SECONDS)
+                        .readTimeout(3, TimeUnit.SECONDS)
+                        .build()
+        );
+    }
+
+    @Bean
     public LdapClient ldapClient() {
         return new LdapClientImpl();
     }
@@ -125,6 +157,10 @@ public class ApplicationConfig {
                 .getServiceToken("nom-api", "nom", "prod-gcp");
 
         return new CachedNomClient(new NomClientImpl("https://nom-api.intern.nav.no", serviceTokenSupplier));
+    }
+
+    private static boolean isProduction() {
+        return EnvironmentUtils.isProduction().orElseThrow();
     }
 
 }
