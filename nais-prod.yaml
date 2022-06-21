@@ -6,7 +6,7 @@ metadata:
   labels:
     team: pto
 spec:
-  image: docker.pkg.github.com/navikt/veilarbveileder/veilarbveileder:{{version}}
+  image: ghcr.io/navikt/veilarbveileder/veilarbveileder:{{version}}
   port: 8080
   webproxy: true
   secureLogs:
