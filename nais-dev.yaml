@@ -62,6 +62,9 @@ spec:
         - application: veilarbpersonflate
           namespace: poao
           cluster: dev-gcp
+        - application: beslutteroversikt
+          namespace: poao
+          cluster: dev-gcp
   envFrom:
     - configmap: pto-config
   env:
