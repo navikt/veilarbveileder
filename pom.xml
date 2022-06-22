@@ -134,7 +134,7 @@
         <dependency>
             <groupId>com.github.navikt.poao-tilgang</groupId>
             <artifactId>client</artifactId>
-            <version>44abb3d5c357ae0a9776bac1c6eafc8cf9971500</version>
+            <version>fcb6bb07710e322b7290d513e002ae8ac9bca339</version>
         </dependency>
 
         <dependency>
