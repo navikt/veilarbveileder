@@ -11,7 +11,6 @@ import no.nav.veilarbveileder.domain.VeiledereResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static no.nav.veilarbveileder.service.AuthService.ROLLE_MODIA_ADMIN;
 
