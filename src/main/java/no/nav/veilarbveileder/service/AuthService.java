@@ -59,7 +59,7 @@ public class AuthService {
                 Decision decisionPoaoTilgang = tilgangClient.harVeilederTilgangTilModia(getInnloggetVeilederIdent().get());
                 boolean harTilgangPoaoTilgang = Decision.Type.PERMIT.equals(decisionPoaoTilgang.getType());
                 if (harTilgang != harTilgangPoaoTilgang) {
-                    log.warn("Forskjellig resultat fra poao-tilgang og abac-modia");
+                    log.info("Forskjellig resultat fra poao-tilgang og abac-modia");
                 }
             } catch (Exception e) {
                 log.error("Kall til poao-tilgang feilet", e);
