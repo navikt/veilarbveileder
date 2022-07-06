@@ -32,6 +32,7 @@ import no.nav.common.utils.EnvironmentUtils;
 import no.nav.common.utils.UrlUtils;
 import no.nav.poao_tilgang.client.TilgangClient;
 import no.nav.poao_tilgang.client.TilgangHttpClient;
+import no.nav.veilarbveileder.client.CachedTilgangClient;
 import no.nav.veilarbveileder.client.LdapClient;
 import no.nav.veilarbveileder.client.LdapClientImpl;
 import no.nav.veilarbveileder.utils.DevNomClient;
@@ -115,7 +116,7 @@ public class ApplicationConfig {
 
         String tokenScope = String.format("api://%s-gcp.poao.poao-tilgang/.default", isProduction() ? "prod" : "dev");
 
-        return new TilgangHttpClient(
+        TilgangHttpClient tilgangClient = new TilgangHttpClient(
                 url,
                 () -> tokenClient.createMachineToMachineToken(tokenScope),
                 RestClient.baseClientBuilder()
@@ -123,6 +124,8 @@ public class ApplicationConfig {
                         .readTimeout(3, TimeUnit.SECONDS)
                         .build()
         );
+
+        return new CachedTilgangClient(tilgangClient);
     }
 
     @Bean
