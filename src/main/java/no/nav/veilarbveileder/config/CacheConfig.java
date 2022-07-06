@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 @EnableCaching
 public class CacheConfig {
     public static final String VEILEDER_ROLLE_CACHE_NAME = "veilederRolleCache";
+    public static final String TILGANG_TIL_MODIA_CACHE_NAME = "tilgangTilModiaCache";
 
     @Bean
     public Cache veilederRolleCache() {
@@ -22,4 +23,11 @@ public class CacheConfig {
                 .build());
     }
 
+    @Bean
+    public Cache tilgangTilModiaCache() {
+        return new CaffeineCache(TILGANG_TIL_MODIA_CACHE_NAME, Caffeine.newBuilder()
+                .expireAfterWrite(1, TimeUnit.HOURS)
+                .maximumSize(10_000)
+                .build());
+    }
 }
