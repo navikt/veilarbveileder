@@ -2,7 +2,6 @@ package no.nav.veilarbveileder.config;
 
 import no.nav.common.abac.AbacClient;
 import no.nav.common.abac.VeilarbPep;
-import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.veilarbveileder.mock.AbacClientMock;
 import no.nav.veilarbveileder.mock.VeilarbPepMock;
 import no.nav.veilarbveileder.service.VeilederOgEnhetServiceV2;
