@@ -119,10 +119,7 @@ public class ApplicationConfig {
         TilgangHttpClient tilgangClient = new TilgangHttpClient(
                 url,
                 () -> tokenClient.createMachineToMachineToken(tokenScope),
-                RestClient.baseClientBuilder()
-                        .connectTimeout(2, TimeUnit.SECONDS)
-                        .readTimeout(3, TimeUnit.SECONDS)
-                        .build()
+                RestClient.baseClient()
         );
 
         return new CachedTilgangClient(tilgangClient);
