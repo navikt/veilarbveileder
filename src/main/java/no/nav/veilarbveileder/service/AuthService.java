@@ -53,20 +53,17 @@ public class AuthService {
     }
 
     public void sjekkTilgangTilModia() {
-        boolean harTilgang = modiaPep.harVeilederTilgangTilModia(getInnloggetBrukerToken());
-        if (unleashClient.isEnabled("veilarbveileder.poao-tilgang.sammenligne")) {
-            try {
-                Decision decisionPoaoTilgang = tilgangClient.harVeilederTilgangTilModia(getInnloggetVeilederIdent().get());
-                boolean harTilgangPoaoTilgang = Decision.Type.PERMIT.equals(decisionPoaoTilgang.getType());
-                if (harTilgang != harTilgangPoaoTilgang) {
-                    log.info("Forskjellig resultat fra poao-tilgang og abac-modia");
-                }
-            } catch (Exception e) {
-                log.error("Kall til poao-tilgang feilet", e);
+        if (unleashClient.isEnabled("veilarbveileder.poao-tilgang.bruk")) {
+            Decision decisionPoaoTilgang = tilgangClient.harVeilederTilgangTilModia(getInnloggetVeilederIdent().get());
+            boolean harTilgang = Decision.Type.PERMIT.equals(decisionPoaoTilgang.getType());
+            if (!harTilgang) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia");
             }
-        }
-        if (!harTilgang) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia");
+        } else {
+            boolean harTilgang = modiaPep.harVeilederTilgangTilModia(getInnloggetBrukerToken());
+            if (!harTilgang) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia");
+            }
         }
     }
 
