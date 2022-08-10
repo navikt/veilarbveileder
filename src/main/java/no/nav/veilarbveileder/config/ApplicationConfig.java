@@ -36,7 +36,6 @@ import no.nav.veilarbveileder.client.CachedTilgangClient;
 import no.nav.veilarbveileder.client.LdapClient;
 import no.nav.veilarbveileder.client.LdapClientImpl;
 import no.nav.veilarbveileder.utils.DevNomClient;
-import no.nav.veilarbveileder.utils.ModiaPep;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -96,16 +95,6 @@ public class ApplicationConfig {
                 properties.getAbacVeilarbUrl(), serviceUserCredentials.username,
                 serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
         );
-    }
-
-    @Bean
-    public ModiaPep modiaPep(EnvironmentProperties properties, Credentials serviceUserCredentials) {
-        var pep = VeilarbPepFactory.get(
-                properties.getAbacModiaUrl(), serviceUserCredentials.username,
-                serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
-        );
-
-        return new ModiaPep(pep);
     }
 
     @Bean
