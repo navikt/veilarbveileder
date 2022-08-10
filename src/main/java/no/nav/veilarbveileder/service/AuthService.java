@@ -10,7 +10,6 @@ import no.nav.common.types.identer.NavIdent;
 import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.TilgangClient;
 import no.nav.veilarbveileder.client.LdapClient;
-import no.nav.veilarbveileder.utils.ModiaPep;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,11 +25,7 @@ public class AuthService {
 
     private final TilgangClient tilgangClient;
 
-    private final ModiaPep modiaPep;
-
     private final LdapClient ldapClient;
-
-    private final UnleashClient unleashClient;
 
     public static final String ROLLE_MODIA_ADMIN = "0000-GA-Modia_Admin";
 
@@ -53,17 +48,10 @@ public class AuthService {
     }
 
     public void sjekkTilgangTilModia() {
-        if (unleashClient.isEnabled("veilarbveileder.poao-tilgang.bruk")) {
-            Decision decisionPoaoTilgang = tilgangClient.harVeilederTilgangTilModia(getInnloggetVeilederIdent().get());
-            boolean harTilgang = Decision.Type.PERMIT.equals(decisionPoaoTilgang.getType());
-            if (!harTilgang) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia");
-            }
-        } else {
-            boolean harTilgang = modiaPep.harVeilederTilgangTilModia(getInnloggetBrukerToken());
-            if (!harTilgang) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia");
-            }
+        Decision decisionPoaoTilgang = tilgangClient.harVeilederTilgangTilModia(getInnloggetVeilederIdent().get());
+        boolean harTilgang = Decision.Type.PERMIT.equals(decisionPoaoTilgang.getType());
+        if (!harTilgang) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia");
         }
     }
 
