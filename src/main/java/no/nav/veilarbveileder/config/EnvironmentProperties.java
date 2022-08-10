@@ -27,8 +27,6 @@ public class EnvironmentProperties {
 
     private String abacVeilarbUrl;
 
-    private String abacModiaUrl;
-
     private String norg2Url;
 
     private String unleashUrl;
