@@ -9,16 +9,16 @@ import no.nav.veilarbveileder.service.AuthService;
 import no.nav.veilarbveileder.service.VeilederOgEnhetServiceV2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.ws.rs.Produces;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/veileder")
+@Produces(MediaType.APPLICATION_JSON_VALUE)
 public class VeilederController {
 
     private final VeilederOgEnhetServiceV2 veilederOgEnhetService;
@@ -54,6 +54,12 @@ public class VeilederController {
     public Veileder hentVeilederData() {
         authService.sjekkTilgangTilModia();
         return veilederOgEnhetService.hentVeilederData(authService.getInnloggetVeilederIdent());
+    }
+
+    @PostMapping("/list")
+    public List<Veileder> hentVeilederForIdent(@RequestBody List<NavIdent> identer) {
+        authService.sjekkTilgangTilModia();
+        return veilederOgEnhetService.hentVeiledereData(identer);
     }
 
     @GetMapping("/v2/me")

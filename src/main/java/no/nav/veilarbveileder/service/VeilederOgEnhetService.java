@@ -18,6 +18,8 @@ public interface VeilederOgEnhetService {
 
     Veileder hentVeilederData(NavIdent navIdent);
 
+    List<Veileder> hentVeiledereData(List<NavIdent> navIdent);
+
     VeilederInfo hentVeilederInfo(NavIdent navIdent);
 
     VeiledereResponse hentRessursListe(EnhetId enhetId);
