@@ -1,6 +1,7 @@
 package no.nav.veilarbveileder.controller;
 
 import no.nav.common.types.identer.NavIdent;
+import no.nav.veilarbveileder.controller.dto.ListVeiledereRequest;
 import no.nav.veilarbveileder.domain.IdentOgEnhetliste;
 import no.nav.veilarbveileder.domain.PortefoljeEnhet;
 import no.nav.veilarbveileder.domain.Veileder;
@@ -57,9 +58,9 @@ public class VeilederController {
     }
 
     @PostMapping("/list")
-    public List<Veileder> hentVeilederForIdent(@RequestBody List<NavIdent> identer) {
+    public List<Veileder> hentVeilederForIdent(@RequestBody ListVeiledereRequest request) {
         authService.sjekkTilgangTilModia();
-        return veilederOgEnhetService.hentVeiledereData(identer);
+        return veilederOgEnhetService.hentVeiledereData(request.getIdenter());
     }
 
     @GetMapping("/v2/me")
