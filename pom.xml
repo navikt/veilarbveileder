@@ -97,11 +97,6 @@
             <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
-            <version>3.1.2</version>
-        </dependency>
-        <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.10.0</version>
@@ -129,11 +124,6 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>client</artifactId>
-            <version>${common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.common</groupId>
-            <artifactId>cxf</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
@@ -212,10 +202,15 @@
             <version>${common.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
+            <version>3.1.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
