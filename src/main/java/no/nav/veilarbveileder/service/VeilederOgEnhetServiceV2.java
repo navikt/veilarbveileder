@@ -41,6 +41,11 @@ public class VeilederOgEnhetServiceV2 implements VeilederOgEnhetService {
     }
 
     @Override
+    public List<Veileder> hentVeiledereData(List<NavIdent> navIdenter) {
+        return veilederService.hentVeiledere(navIdenter);
+    }
+
+    @Override
     public VeilederInfo hentVeilederInfo(NavIdent navIdent) {
         Veileder veileder = hentVeilederData(navIdent);
         List<PortefoljeEnhet> veilederEnheter = hentEnhetListe(navIdent);

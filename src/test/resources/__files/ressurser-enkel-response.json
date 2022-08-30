@@ -1,0 +1,15 @@
+{
+  "data": {
+    "ressurser": [
+      {
+        "id": "Z1234",
+        "ressurs": {
+          "navIdent": "Z1234",
+          "visningsNavn": "E1234, F1234 M1234",
+          "fornavn": "F1234 M1234",
+          "etternavn": "E1234"
+        }
+      }
+    ]
+  }
+}
