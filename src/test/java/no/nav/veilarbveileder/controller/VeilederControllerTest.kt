@@ -130,7 +130,9 @@ class VeilederControllerTest {
             post("/api/veileder/list")
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(JsonUtils.toJson(listOf(veilederIdent1, veilederIdent2)))
+                .content("""
+                    { "identer": ["$veilederIdent1", "$veilederIdent2"] }
+                """.trimIndent())
         )
             .andExpect(status().isOk)
             .andExpect(content().json(expectedResponseContent, false))
