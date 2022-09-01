@@ -66,6 +66,9 @@ spec:
         - application: veilarbvedtaksstotte
           namespace: pto
           cluster: prod-fss
+        - application: mulighetsrommet-api
+          namespace: team-mulighetsrommet
+          cluster: prod-gcp
   envFrom:
     - configmap: pto-config
   env:
