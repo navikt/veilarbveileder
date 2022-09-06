@@ -33,6 +33,7 @@ spec:
       memory: 1024Mi
   ingresses:
     - https://veilarbveileder.prod-fss-pub.nais.io
+    - https://veilarbveileder.intern.nav.no
     - https://veilarbveileder.nais.adeo.no
     - https://app.adeo.no/veilarbveileder
   vault:
