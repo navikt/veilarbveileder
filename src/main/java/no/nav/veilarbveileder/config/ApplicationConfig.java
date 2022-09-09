@@ -56,11 +56,6 @@ public class ApplicationConfig {
     public final static String APPLICATION_NAME = "veilarbveileder";
 
     @Bean
-    public Credentials credentials() {
-        return getServiceUserCredentials();
-    }
-
-    @Bean
     public AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient() {
         return AzureAdTokenClientBuilder.builder()
                 .withNaisDefaults()
@@ -88,7 +83,8 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public VeilarbPep veilarbPep(EnvironmentProperties properties, Credentials serviceUserCredentials) {
+    public VeilarbPep veilarbPep(EnvironmentProperties properties) {
+        Credentials serviceUserCredentials = getServiceUserCredentials();
         return VeilarbPepFactory.get(
                 properties.getAbacVeilarbUrl(), serviceUserCredentials.username,
                 serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
