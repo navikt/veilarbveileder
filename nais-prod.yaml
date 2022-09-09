@@ -33,6 +33,7 @@ spec:
       memory: 1024Mi
   ingresses:
     - https://veilarbveileder.prod-fss-pub.nais.io
+    - https://veilarbveileder.intern.nav.no
     - https://veilarbveileder.nais.adeo.no
     - https://app.adeo.no/veilarbveileder
   vault:
@@ -45,7 +46,8 @@ spec:
       enabled: true
       claims:
         extra:
-          - "NAVident"
+          - NAVident
+          - azp_name
   accessPolicy:
     inbound:
       rules:
@@ -54,6 +56,9 @@ spec:
         - application: veilarbportefoljeflatefs
           namespace: obo
           cluster: prod-gcp
+        - application: veilarbfilter
+          namespace: pto
+          cluster: prod-fss
         - application: veilarbportefolje
           namespace: pto
           cluster: prod-fss

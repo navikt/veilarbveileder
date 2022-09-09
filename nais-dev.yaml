@@ -48,7 +48,8 @@ spec:
       enabled: true
       claims:
         extra:
-          - "NAVident"
+          - NAVident
+          - azp_name
   accessPolicy:
     inbound:
       rules:
@@ -57,6 +58,9 @@ spec:
         - application: veilarbportefoljeflatefs
           namespace: obo
           cluster: dev-gcp
+        - application: veilarbfilter
+          namespace: pto
+          cluster: dev-fss
         - application: veilarbportefolje
           namespace: pto
           cluster: dev-fss
