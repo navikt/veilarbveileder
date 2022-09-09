@@ -56,7 +56,9 @@ public class EnhetController {
 
     @GetMapping("/{enhetId}/identer")
     public List<NavIdent> hentIdenter(@PathVariable("enhetId") EnhetId enhetId) {
-        if (authService.erSystemBruker()) {
+        if(authService.erSystemBrukerFraAzureAd() && authService.erGodkjentAzureAdSystembruker()){
+            return veilederOgEnhetService.hentIdentListe(enhetId);
+        } else if (authService.erSystemBruker() ) {
             authService.sjekkTilgangTilOppfolging();
         } else {
             authService.sjekkTilgangTilModia();
