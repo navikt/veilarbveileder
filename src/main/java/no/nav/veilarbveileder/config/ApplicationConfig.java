@@ -21,8 +21,6 @@ import no.nav.common.client.norg2.NorgHttp2Client;
 import no.nav.common.featuretoggle.UnleashClient;
 import no.nav.common.featuretoggle.UnleashClientImpl;
 import no.nav.common.rest.client.RestClient;
-import no.nav.common.sts.ServiceToServiceTokenProvider;
-import no.nav.common.sts.utils.AzureAdServiceTokenProviderBuilder;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.types.identer.EnhetId;
@@ -130,21 +128,12 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public ServiceToServiceTokenProvider serviceToServiceTokenProvider() {
-        return AzureAdServiceTokenProviderBuilder.builder()
-                .withEnvironmentDefaults()
-                .build();
-    }
-
-    @Bean
-    public NomClient nomClient() {
+    public NomClient nomClient(AzureAdMachineToMachineTokenClient tokenClient) {
         if (EnvironmentUtils.isDevelopment().orElse(false)) {
             return new DevNomClient();
         }
 
-        Supplier<String> serviceTokenSupplier = () -> serviceToServiceTokenProvider()
-                .getServiceToken("nom-api", "nom", "prod-gcp");
-
+        Supplier<String> serviceTokenSupplier = () -> tokenClient.createMachineToMachineToken("api://prod-gcp.nom.nom-api/.default");
         return new CachedNomClient(new NomClientImpl("https://nom-api.intern.nav.no", serviceTokenSupplier));
     }
 
