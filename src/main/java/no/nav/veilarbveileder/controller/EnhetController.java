@@ -43,7 +43,7 @@ public class EnhetController {
     @GetMapping("/{enhetId}/navn")
     public PortefoljeEnhet hentNavn(@PathVariable("enhetId") EnhetId enhetId) {
         return enhetService.hentEnhet(enhetId)
-            .orElse(new PortefoljeEnhet(enhetId, "Ukjent eller utgått enhet"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/{enhetId}/veiledere")
