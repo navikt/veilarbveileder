@@ -43,7 +43,7 @@ public class EnhetController {
     @GetMapping("/{enhetId}/navn")
     public PortefoljeEnhet hentNavn(@PathVariable("enhetId") EnhetId enhetId) {
         return enhetService.hentEnhet(enhetId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/{enhetId}/veiledere")

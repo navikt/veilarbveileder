@@ -1,6 +1,7 @@
 package no.nav.veilarbveileder.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.axsys.AxsysClient;
 import no.nav.common.client.norg2.Norg2Client;
 import no.nav.common.types.identer.EnhetId;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EnhetService {
 
     private final Norg2Client norg2Client;
@@ -22,12 +24,13 @@ public class EnhetService {
     private final AxsysClient axsysClient;
 
     public Optional<PortefoljeEnhet> hentEnhet(EnhetId enhetId) {
-        return norg2Client
-                .alleAktiveEnheter()
-                .stream()
-                .filter(enhet -> enhet.getEnhetNr().equals(enhetId.get()))
-                .findFirst()
-                .map(Mappers::tilPortefoljeEnhet);
+        try {
+            var enhet = norg2Client.hentEnhet(enhetId.get());
+            return Optional.of(Mappers.tilPortefoljeEnhet(enhet));
+        } catch (Exception e) {
+            log.warn(String.format("Fant ikke enhet med id %s", enhetId), e);
+            return Optional.empty();
+        }
     }
 
     public List<PortefoljeEnhet> alleEnheter() {
