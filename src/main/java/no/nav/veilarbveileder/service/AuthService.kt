@@ -1,116 +1,133 @@
-package no.nav.veilarbveileder.service;
+package no.nav.veilarbveileder.service
 
-import com.nimbusds.jwt.JWTClaimsSet;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import no.nav.common.abac.VeilarbPep;
-import no.nav.common.auth.context.AuthContextHolder;
-import no.nav.common.types.identer.EnhetId;
-import no.nav.common.types.identer.NavIdent;
-import no.nav.poao_tilgang.client.Decision;
-import no.nav.poao_tilgang.client.TilgangClient;
-import no.nav.veilarbveileder.client.LdapClient;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.text.ParseException;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
+import com.nimbusds.jwt.JWTClaimsSet
+import lombok.extern.slf4j.Slf4j
+import no.nav.common.abac.VeilarbPep
+import no.nav.common.auth.context.AuthContextHolder
+import no.nav.common.types.identer.EnhetId
+import no.nav.common.types.identer.NavIdent
+import no.nav.poao_tilgang.client.*
+import no.nav.veilarbveileder.client.LdapClient
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
+import java.text.ParseException
+import java.util.*
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
-public class AuthService {
+class AuthService(
+    private val authContextHolder: AuthContextHolder,
+    private val veilarbPep: VeilarbPep,
+    private val poaoTilgangClient: PoaoTilgangClient,
+    private val unleashService: UnleashService,
+    private val ldapClient: LdapClient) {
+    val innloggetVeilederIdent: NavIdent
+        get() = authContextHolder.navIdent.orElseThrow {
+            ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "NAV ident is missing"
+            )
+        }
+    val innloggetBrukerToken: String
+        get() = authContextHolder.idTokenString.orElseThrow {
+            ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "Token is missing"
+            )
+        }
 
-    private final AuthContextHolder authContextHolder;
-
-    private final VeilarbPep veilarbPep;
-
-    private final TilgangClient tilgangClient;
-
-    private final LdapClient ldapClient;
-
-    public static final String ROLLE_MODIA_ADMIN = "0000-GA-Modia_Admin";
-    public static final List<String> ACCEPTLIST_AZURE_SYSTEM_USERS = List.of("veilarbfilter");
-
-    public NavIdent getInnloggetVeilederIdent() {
-        return authContextHolder.getNavIdent().orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "NAV ident is missing"));
+    fun erSystemBruker(): Boolean {
+        return authContextHolder.erSystemBruker()
     }
+    fun hentInnloggetVeilederUUID(): UUID =
+        authContextHolder
+            .idTokenClaims.flatMap { authContextHolder.getStringClaim(it, "oid") }
+            .map { UUID.fromString(it) }
+            .orElseThrow { ResponseStatusException(HttpStatus.FORBIDDEN, "Fant ikke oid for innlogget veileder") }
 
-    public String getInnloggetBrukerToken() {
-        return authContextHolder.getIdTokenString().orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is missing"));
-    }
-
-    public boolean erSystemBruker() {
-        return authContextHolder.erSystemBruker();
-    }
-
-    public void sjekkTilgangTilOppfolging() {
-        if (!veilarbPep.harTilgangTilOppfolging(getInnloggetBrukerToken())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til oppfølging");
+    fun sjekkTilgangTilOppfolging() {
+        if (!veilarbPep.harTilgangTilOppfolging(innloggetBrukerToken)) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til oppfølging")
         }
     }
+    fun sjekkTilgangTilModia() {
+        if (unleashService.isPoaoTilgangEnabled) {
+            val tilgangResult = poaoTilgangClient.evaluatePolicy(NavAnsattTilgangTilModiaPolicyInput(
+                hentInnloggetVeilederUUID())
+            ).getOrThrow()
 
-    public void sjekkTilgangTilModia() {
-        Decision decisionPoaoTilgang = tilgangClient.harVeilederTilgangTilModia(getInnloggetVeilederIdent().get());
-        boolean harTilgang = Decision.Type.PERMIT.equals(decisionPoaoTilgang.getType());
+            if (tilgangResult.isDeny) {
+                throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia")
+            }
+        } else {
+            sjekkTilgangTilOppfolging()
+        }
+    }
+    /**
+    fun sjekkTilgangTilModia() {
+        val decisionPoaoTilgang: Decision = poaoTilgangClient.harVeilederTilgangTilModia(
+            innloggetVeilederIdent.get()
+        )
+        val harTilgang = Decision.Type.PERMIT == decisionPoaoTilgang.type
         if (!harTilgang) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia");
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia")
         }
     }
-
-    public void sjekkVeilederTilgangTilEnhet(EnhetId enhetId) {
-        NavIdent ident = getInnloggetVeilederIdent();
+    */
+    fun sjekkVeilederTilgangTilEnhet(enhetId: EnhetId?) {
+        val ident = innloggetVeilederIdent
         if (!harModiaAdminRolle(ident) && !veilarbPep.harVeilederTilgangTilEnhet(ident, enhetId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet");
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
         }
     }
 
-    public boolean harModiaAdminRolle(NavIdent ident) {
-        return ldapClient.veilederHarRolle(ident, ROLLE_MODIA_ADMIN);
+    fun harModiaAdminRolle(ident: NavIdent?): Boolean {
+        return ldapClient.veilederHarRolle(ident, ROLLE_MODIA_ADMIN)
     }
 
-
-    public boolean erSystemBrukerFraAzureAd() {
-        return erSystemBruker() && harAADRolleForSystemTilSystemTilgang();
+    fun erSystemBrukerFraAzureAd(): Boolean {
+        return erSystemBruker() && harAADRolleForSystemTilSystemTilgang()
     }
 
-    private boolean harAADRolleForSystemTilSystemTilgang() {
-        return authContextHolder.getIdTokenClaims()
-                .flatMap(claims -> {
-                    try {
-                        return Optional.ofNullable(claims.getStringListClaim("roles"));
-                    } catch (ParseException e) {
-                        return Optional.empty();
-                    }
-                })
-                .orElse(emptyList())
-                .contains("access_as_application");
+    private fun harAADRolleForSystemTilSystemTilgang(): Boolean {
+        return authContextHolder.idTokenClaims
+            .flatMap { claims: JWTClaimsSet ->
+                try {
+                    return@flatMap Optional.ofNullable<List<String>>(claims.getStringListClaim("roles"))
+                } catch (e: ParseException) {
+                    return@flatMap Optional.empty<List<String>>()
+                }
+            }
+            .orElse(emptyList())
+            .contains("access_as_application")
     }
 
-    public boolean erGodkjentAzureAdSystembruker() {
-        return ACCEPTLIST_AZURE_SYSTEM_USERS.contains(hentApplikasjonFraContex());
+    fun erGodkjentAzureAdSystembruker(): Boolean {
+        return ACCEPTLIST_AZURE_SYSTEM_USERS.contains(hentApplikasjonFraContex())
     }
 
-    private String hentApplikasjonFraContex() {
-        return authContextHolder.getIdTokenClaims()
-                .flatMap(claims -> getStringClaimOrEmpty(claims, "azp_name")) //  "cluster:team:app"
-                .map(claim -> claim.split(":"))
-                .filter(claims -> claims.length == 3)
-                .map(claims -> claims[2])
-                .orElse(null);
+    private fun hentApplikasjonFraContex(): String? {
+        return authContextHolder.idTokenClaims
+            .flatMap { claims: JWTClaimsSet -> getStringClaimOrEmpty(claims, "azp_name") } //  "cluster:team:app"
+            .map { claim: String ->
+                claim.split(":".toRegex()).dropLastWhile { it.isEmpty() }
+                    .toTypedArray()
+            }
+            .filter { claims: Array<String> -> claims.size == 3 }
+            .map { claims: Array<String> -> claims[2] }
+            .orElse(null)
     }
 
-    private static Optional<String> getStringClaimOrEmpty(JWTClaimsSet claims, String claimName) {
-        try {
-            return ofNullable(claims.getStringClaim(claimName));
-        } catch (Exception e) {
-            return empty();
+    companion object {
+        const val ROLLE_MODIA_ADMIN = "0000-GA-Modia_Admin"
+        val ACCEPTLIST_AZURE_SYSTEM_USERS = java.util.List.of("veilarbfilter")
+        private fun getStringClaimOrEmpty(claims: JWTClaimsSet, claimName: String): Optional<String> {
+            return try {
+                Optional.ofNullable(claims.getStringClaim(claimName))
+            } catch (e: Exception) {
+                Optional.empty()
+            }
         }
     }
 }

@@ -2,16 +2,22 @@ package no.nav.veilarbveileder.config
 
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.nom.NomClientImpl
+import no.nav.poao_tilgang.client.PoaoTilgangClient
+import no.nav.veilarbveileder.mock.PoaoTilgangClientMock
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 
 @TestConfiguration
-class ApplicationConfig {
+class ApplicationTestConfig {
 
     @Bean
     @Primary
     fun nomClient(): NomClient {
         return NomClientImpl("http://localhost:8080") { "" }
+    }
+    @Bean
+    fun poaoTilgangClient(): PoaoTilgangClient {
+        return PoaoTilgangClientMock()
     }
 }
