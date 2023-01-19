@@ -29,6 +29,7 @@ class AuthService(
                 "NAV ident is missing"
             )
         }
+
     val innloggetBrukerToken: String
         get() = authContextHolder.idTokenString.orElseThrow {
             ResponseStatusException(
@@ -64,24 +65,34 @@ class AuthService(
             sjekkTilgangTilOppfolging()
         }
     }
-    /**
-    fun sjekkTilgangTilModia() {
-        val decisionPoaoTilgang: Decision = poaoTilgangClient.harVeilederTilgangTilModia(
-            innloggetVeilederIdent.get()
-        )
-        val harTilgang = Decision.Type.PERMIT == decisionPoaoTilgang.type
-        if (!harTilgang) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia")
+
+    fun sjekkVeilederTilgangTilEnhet(enhetId: EnhetId?) {
+        val ident = innloggetVeilederIdent
+
+        if (unleashService.isPoaoTilgangEnabled) {
+           if (!harModiaAdminRolle(ident)) {
+               val tilgangResult = poaoTilgangClient.evaluatePolicy(
+                   NavAnsattTilgangTilNavEnhetPolicyInput(hentInnloggetVeilederUUID(), enhetId.toString())
+               ).getOrThrow()
+
+               if (tilgangResult.isDeny) {
+                   throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
+               }
+           }
+        } else {
+            if (!harModiaAdminRolle(ident) && !veilarbPep.harVeilederTilgangTilEnhet(ident, enhetId)) {
+                throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
+            }
         }
     }
-    */
+    /*
     fun sjekkVeilederTilgangTilEnhet(enhetId: EnhetId?) {
         val ident = innloggetVeilederIdent
         if (!harModiaAdminRolle(ident) && !veilarbPep.harVeilederTilgangTilEnhet(ident, enhetId)) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
         }
     }
-
+    */
     fun harModiaAdminRolle(ident: NavIdent?): Boolean {
         return ldapClient.veilederHarRolle(ident, ROLLE_MODIA_ADMIN)
     }
