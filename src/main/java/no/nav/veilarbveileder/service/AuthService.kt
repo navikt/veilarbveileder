@@ -17,6 +17,7 @@ import java.util.*
 @Service
 @Slf4j
 class AuthService(
+    private val auditLogService: AuditLogService,
     private val authContextHolder: AuthContextHolder,
     private val veilarbPep: VeilarbPep,
     private val poaoTilgangClient: PoaoTilgangClient,
@@ -57,7 +58,10 @@ class AuthService(
             val tilgangResult = poaoTilgangClient.evaluatePolicy(NavAnsattTilgangTilModiaPolicyInput(
                 hentInnloggetVeilederUUID())
             ).getOrThrow()
-
+            auditLogService.auditLogWithMessageAndDestinationUserId(
+                "Veileder har spurt om tilgang til ",
+                "Modia",
+                hentInnloggetVeilederUUID().toString() )
             if (tilgangResult.isDeny) {
                 throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia")
             }
@@ -74,7 +78,7 @@ class AuthService(
                val tilgangResult = poaoTilgangClient.evaluatePolicy(
                    NavAnsattTilgangTilNavEnhetPolicyInput(hentInnloggetVeilederUUID(), enhetId.toString())
                ).getOrThrow()
-
+               auditLogService.auditLogWithMessageAndDestinationUserId("Bedt om tilgang til enhet ", enhetId.toString(), hentInnloggetVeilederUUID().toString() )
                if (tilgangResult.isDeny) {
                    throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
                }
@@ -85,14 +89,7 @@ class AuthService(
             }
         }
     }
-    /*
-    fun sjekkVeilederTilgangTilEnhet(enhetId: EnhetId?) {
-        val ident = innloggetVeilederIdent
-        if (!harModiaAdminRolle(ident) && !veilarbPep.harVeilederTilgangTilEnhet(ident, enhetId)) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
-        }
-    }
-    */
+
     fun harModiaAdminRolle(ident: NavIdent?): Boolean {
         return ldapClient.veilederHarRolle(ident, ROLLE_MODIA_ADMIN)
     }
