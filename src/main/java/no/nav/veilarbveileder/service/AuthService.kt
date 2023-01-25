@@ -62,6 +62,7 @@ class AuthService(
                 "Veileder har spurt om tilgang til ",
                 "Modia",
                 hentInnloggetVeilederUUID().toString() )
+            println("i sjekkTilgangTilModia")
             if (tilgangResult.isDeny) {
                 throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia")
             }
