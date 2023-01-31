@@ -209,11 +209,6 @@
             <version>3.1.2</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>no.nav.common</groupId>
-            <artifactId>audit-log</artifactId>
-            <version>2.2023.01.10_13.49-81ddc732df3a</version>
-        </dependency>
     </dependencies>
 
     <repositories>
