@@ -69,18 +69,14 @@ class AuthService(
         val ident = innloggetVeilederIdent
 
         if (unleashService.isPoaoTilgangEnabled) {
-           if (!harModiaAdminRolle(ident)) {
-               val tilgangResult = poaoTilgangClient.evaluatePolicy(
-                   NavAnsattTilgangTilNavEnhetPolicyInput(hentInnloggetVeilederUUID(), enhetId.toString())
-               ).getOrThrow()
-               if (tilgangResult.isDeny) {
-                   throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
-               }
-           }
-        } else {
-            if (!harModiaAdminRolle(ident) && !veilarbPep.harVeilederTilgangTilEnhet(ident, enhetId)) {
+            val tilgangResult = poaoTilgangClient.evaluatePolicy(
+                NavAnsattTilgangTilNavEnhetPolicyInput(hentInnloggetVeilederUUID(), enhetId.toString())
+            ).getOrThrow()
+            if (tilgangResult.isDeny) {
                 throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
             }
+        } else if (!harModiaAdminRolle(ident) && !veilarbPep.harVeilederTilgangTilEnhet(ident, enhetId)) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
         }
     }
 
@@ -123,7 +119,7 @@ class AuthService(
 
     companion object {
         const val ROLLE_MODIA_ADMIN = "0000-GA-Modia_Admin"
-        val ACCEPTLIST_AZURE_SYSTEM_USERS = java.util.List.of("veilarbfilter")
+        val ACCEPTLIST_AZURE_SYSTEM_USERS = listOf("veilarbfilter")
         private fun getStringClaimOrEmpty(claims: JWTClaimsSet, claimName: String): Optional<String> {
             return try {
                 Optional.ofNullable(claims.getStringClaim(claimName))
