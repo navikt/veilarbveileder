@@ -11,5 +11,6 @@ object EnvironmentConfig {
         System.setProperty("AZURE_APP_CLIENT_ID", "")
         System.setProperty("SRVVEILARBVEILEDER_USERNAME", "")
         System.setProperty("SRVVEILARBVEILEDER_PASSWORD", "")
+        System.setProperty("POAO_TILGANG_SCOPE", "")
     }
 }
