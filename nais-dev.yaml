@@ -45,6 +45,7 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
   azure:
     application:
+      allowAllUsers: true
       enabled: true
       claims:
         extra:
