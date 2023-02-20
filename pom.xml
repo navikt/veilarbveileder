@@ -21,7 +21,7 @@
     <properties>
         <java.version>17</java.version>
         <common.version>2023.02.08_14.02-e5f1a7a4b9e4</common.version>
-        <kotlin.version>1.7.10</kotlin.version>
+        <kotlin.version>1.8.0</kotlin.version>
     </properties>
 
     <build>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -109,7 +109,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.13</version>
+            <version>1.6.14</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
