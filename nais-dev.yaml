@@ -45,6 +45,7 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
   azure:
     application:
+      allowAllUsers: true
       enabled: true
       claims:
         extra:
@@ -89,3 +90,7 @@ spec:
       value: ldaps://ldapgw.preprod.local
     - name: LDAP_DOMAIN
       value: PREPROD.LOCAL
+    - name: POAO_TILGANG_URL
+      value: https://poao-tilgang.dev.intern.nav.no
+    - name: POAO_TILGANG_SCOPE
+      value: api://dev-gcp.poao.poao-tilgang/.default

@@ -6,7 +6,7 @@ import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.json.JsonUtils
-import no.nav.veilarbveileder.config.ApplicationConfig
+import no.nav.veilarbveileder.config.ApplicationTestConfig
 import no.nav.veilarbveileder.config.EnvironmentConfig
 import no.nav.veilarbveileder.domain.Veileder
 import no.nav.veilarbveileder.service.AuthService
@@ -28,12 +28,12 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 
 @SpringBootTest(
     classes = [
+        ApplicationTestConfig::class,
         VeilederController::class,
         VeilederOgEnhetServiceV2::class,
         EnhetService::class,
         VeilederService::class,
-        NomClient::class,
-        ApplicationConfig::class
+        NomClient::class
     ]
 )
 @AutoConfigureMockMvc

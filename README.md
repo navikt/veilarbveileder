@@ -5,7 +5,7 @@ Veileder-api
 
 # Henvendelser
 
-Spørsmål knyttet til koden eller prosjektet kan stilles ved å opprette en issue.
+Spørsmål knyttet til koden eller prosjektet kan stilles ved å opprette en issue i Porten.
 
 ## For NAV-ansatte
 
