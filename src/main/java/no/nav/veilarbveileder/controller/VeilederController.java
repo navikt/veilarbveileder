@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.ws.rs.Produces;
+import jakarta.ws.rs.Produces;
 import java.util.List;
 
 @RestController
