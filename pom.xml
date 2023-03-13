@@ -21,7 +21,7 @@
     <properties>
         <java.version>17</java.version>
         <common.version>2023.02.08_14.02-e5f1a7a4b9e4</common.version>
-        <kotlin.version>1.8.0</kotlin.version>
+        <kotlin.version>1.8.10</kotlin.version>
     </properties>
 
     <build>
