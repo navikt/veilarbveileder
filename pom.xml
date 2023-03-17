@@ -20,7 +20,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <common.version>3.2023.02.24_13.46-3c88f74b064e</common.version>
+        <common.version>3.2023.03.01_11.54-2d19b8e33bd0</common.version>
         <kotlin.version>1.8.10</kotlin.version>
     </properties>
 
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-            <version>3.1.3</version>
+            <version>3.1.5</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
