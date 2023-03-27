@@ -1,12 +1,10 @@
 package no.nav.veilarbveileder.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
-import jakarta.servlet.http.HttpServletRequest
 import lombok.extern.slf4j.Slf4j
 import no.nav.common.abac.VeilarbPep
 import no.nav.common.abac.VeilarbPepFactory
-import no.nav.common.abac.audit.AuditRequestInfo
-import no.nav.common.abac.audit.AuditRequestInfoSupplier
+import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier
 import no.nav.common.auth.context.AuthContextHolder
 import no.nav.common.auth.context.AuthContextHolderThreadLocal
 import no.nav.common.client.axsys.AxsysClient
@@ -20,8 +18,6 @@ import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.client.norg2.NorgHttp2Client
 import no.nav.common.featuretoggle.UnleashClient
 import no.nav.common.featuretoggle.UnleashClientImpl
-import no.nav.common.rest.filter.LogRequestFilter.resolveCallId
-import no.nav.common.rest.filter.LogRequestFilter.resolveConsumerId
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
 import no.nav.common.types.identer.EnhetId
@@ -39,39 +35,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.web.context.request.RequestAttributes
-import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.web.context.request.ServletRequestAttributes
+
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
 
-class SpringAuditRequestInfoSupplier : AuditRequestInfoSupplier {
-    override fun get(): AuditRequestInfo {
-        return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-            .filter { requestAttributes: RequestAttributes? -> requestAttributes is ServletRequestAttributes }
-            .map { requestAttributes: RequestAttributes -> requestAttributes as ServletRequestAttributes }
-            .map { obj: ServletRequestAttributes -> obj.request }
-            .map { request: HttpServletRequest ->
-                utledRequestInfo(
-                    request
-                )
-            }
-            .orElse(null)
-    }
-
-    companion object {
-        private fun utledRequestInfo(request: HttpServletRequest): AuditRequestInfo {
-            return AuditRequestInfo.builder()
-                .callId(resolveCallId(request))
-                .consumerId(resolveConsumerId(request))
-                .requestMethod(request.method)
-                .requestPath(request.requestURI)
-                .build()
-        }
-    }
-}
 @Slf4j
 @Configuration
 @EnableScheduling
