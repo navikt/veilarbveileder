@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import lombok.extern.slf4j.Slf4j
 import no.nav.common.abac.VeilarbPep
 import no.nav.common.abac.VeilarbPepFactory
-import no.nav.common.abac.audit.JavaxSpringAuditRequestInfoSupplier
+import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier
 import no.nav.common.auth.context.AuthContextHolder
 import no.nav.common.auth.context.AuthContextHolderThreadLocal
 import no.nav.common.client.axsys.AxsysClient
@@ -35,8 +35,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
+
+import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
+
 
 @Slf4j
 @Configuration
@@ -76,7 +79,7 @@ class ApplicationConfig {
         val serviceUserCredentials = ServiceUserUtils.getServiceUserCredentials()
         return VeilarbPepFactory.get(
             properties.abacVeilarbUrl, serviceUserCredentials.username,
-            serviceUserCredentials.password, JavaxSpringAuditRequestInfoSupplier()
+            serviceUserCredentials.password, SpringAuditRequestInfoSupplier()
         )
     }
 
