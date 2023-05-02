@@ -91,6 +91,6 @@ spec:
     - name: LDAP_DOMAIN
       value: PREPROD.LOCAL
     - name: POAO_TILGANG_URL
-      value: https://poao-tilgang.intern.dev.nav.no
+      value: http://poao-tilgang.poao.svc.nais.local
     - name: POAO_TILGANG_SCOPE
-      value: api://dev-gcp.poao.poao-tilgang/.default
+      value: api://dev-fss.poao.poao-tilgang/.default
