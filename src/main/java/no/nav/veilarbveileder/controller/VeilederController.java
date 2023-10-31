@@ -46,7 +46,6 @@ public class VeilederController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til oppfølging");
         }
 
-        authService.sjekkTilgangTilOppfolging();
         List<PortefoljeEnhet> response = veilederOgEnhetService.hentEnhetListe(veilederIdent);
         return new IdentOgEnhetliste(veilederIdent, response);
     }

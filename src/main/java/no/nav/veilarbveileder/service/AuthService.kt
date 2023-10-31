@@ -2,7 +2,6 @@ package no.nav.veilarbveileder.service
 
 import com.nimbusds.jwt.JWTClaimsSet
 import lombok.extern.slf4j.Slf4j
-import no.nav.common.abac.VeilarbPep
 import no.nav.common.auth.context.AuthContextHolder
 import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
@@ -18,7 +17,6 @@ import java.util.*
 @Slf4j
 class AuthService(
     private val authContextHolder: AuthContextHolder,
-    private val veilarbPep: VeilarbPep,
     private val poaoTilgangClient: PoaoTilgangClient,
     private val ldapClient: LdapClient) {
     val innloggetVeilederIdent: NavIdent
@@ -46,11 +44,6 @@ class AuthService(
             .map { UUID.fromString(it) }
             .orElseThrow { ResponseStatusException(HttpStatus.FORBIDDEN, "Fant ikke oid for innlogget veileder") }
 
-    fun sjekkTilgangTilOppfolging() {
-        if (!veilarbPep.harTilgangTilOppfolging(innloggetBrukerToken)) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til oppfølging")
-        }
-    }
     fun sjekkTilgangTilModia() {
         val tilgangResult = poaoTilgangClient.evaluatePolicy(NavAnsattTilgangTilModiaPolicyInput(
             hentInnloggetVeilederUUID())

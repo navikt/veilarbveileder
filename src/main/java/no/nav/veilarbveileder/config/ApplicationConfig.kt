@@ -2,9 +2,6 @@ package no.nav.veilarbveileder.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import lombok.extern.slf4j.Slf4j
-import no.nav.common.abac.VeilarbPep
-import no.nav.common.abac.VeilarbPepFactory
-import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier
 import no.nav.common.auth.context.AuthContextHolder
 import no.nav.common.auth.context.AuthContextHolderThreadLocal
 import no.nav.common.client.axsys.AxsysClient
@@ -72,14 +69,6 @@ class ApplicationConfig {
         return CachedAxsysClient(AxsysClientImpl(url), hentTilgangerCache, hentAnsatteCache)
     }
 
-    @Bean
-    fun veilarbPep(properties: EnvironmentProperties): VeilarbPep {
-        val serviceUserCredentials = ServiceUserUtils.getServiceUserCredentials()
-        return VeilarbPepFactory.get(
-            properties.abacVeilarbUrl, serviceUserCredentials.username,
-            serviceUserCredentials.password, SpringAuditRequestInfoSupplier()
-        )
-    }
 
     @Bean
     fun poaoTilgangClient(
