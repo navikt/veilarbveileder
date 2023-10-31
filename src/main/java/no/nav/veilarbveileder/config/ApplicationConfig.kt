@@ -16,8 +16,6 @@ import no.nav.common.client.nom.NomClient
 import no.nav.common.client.nom.NomClientImpl
 import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.client.norg2.NorgHttp2Client
-import no.nav.common.featuretoggle.UnleashClient
-import no.nav.common.featuretoggle.UnleashClientImpl
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
 import no.nav.common.types.identer.EnhetId
@@ -103,11 +101,6 @@ class ApplicationConfig {
     @Bean
     fun authContextHolder(): AuthContextHolder {
         return AuthContextHolderThreadLocal.instance()
-    }
-
-    @Bean
-    fun unleashClient(properties: EnvironmentProperties): UnleashClient {
-        return UnleashClientImpl(properties.unleashUrl, APPLICATION_NAME)
     }
 
     @Bean

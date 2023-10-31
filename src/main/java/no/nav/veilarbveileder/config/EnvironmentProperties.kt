@@ -9,7 +9,6 @@ data class EnvironmentProperties (
     val naisAadClientId: String,
     val abacVeilarbUrl: String,
     val norg2Url: String,
-    val unleashUrl: String,
     val poaoTilgangUrl: String,
     val poaoTilgangScope: String
 )

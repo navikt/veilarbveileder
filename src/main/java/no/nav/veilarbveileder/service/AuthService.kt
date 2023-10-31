@@ -20,7 +20,6 @@ class AuthService(
     private val authContextHolder: AuthContextHolder,
     private val veilarbPep: VeilarbPep,
     private val poaoTilgangClient: PoaoTilgangClient,
-    private val unleashService: UnleashService,
     private val ldapClient: LdapClient) {
     val innloggetVeilederIdent: NavIdent
         get() = authContextHolder.navIdent.orElseThrow {
@@ -53,29 +52,19 @@ class AuthService(
         }
     }
     fun sjekkTilgangTilModia() {
-        if (unleashService.isPoaoTilgangEnabled) {
-            val tilgangResult = poaoTilgangClient.evaluatePolicy(NavAnsattTilgangTilModiaPolicyInput(
-                hentInnloggetVeilederUUID())
-            ).getOrThrow()
-            if (tilgangResult.isDeny) {
-                throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia")
-            }
-        } else {
-            sjekkTilgangTilOppfolging()
+        val tilgangResult = poaoTilgangClient.evaluatePolicy(NavAnsattTilgangTilModiaPolicyInput(
+            hentInnloggetVeilederUUID())
+        ).getOrThrow()
+        if (tilgangResult.isDeny) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia")
         }
     }
 
     fun sjekkVeilederTilgangTilEnhet(enhetId: EnhetId?) {
-        val ident = innloggetVeilederIdent
-
-        if (unleashService.isPoaoTilgangEnabled) {
-            val tilgangResult = poaoTilgangClient.evaluatePolicy(
-                NavAnsattTilgangTilNavEnhetPolicyInput(hentInnloggetVeilederUUID(), enhetId.toString())
-            ).getOrThrow()
-            if (tilgangResult.isDeny) {
-                throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
-            }
-        } else if (!harModiaAdminRolle(ident) && !veilarbPep.harVeilederTilgangTilEnhet(ident, enhetId)) {
+        val tilgangResult = poaoTilgangClient.evaluatePolicy(
+            NavAnsattTilgangTilNavEnhetPolicyInput(hentInnloggetVeilederUUID(), enhetId.toString())
+        ).getOrThrow()
+        if (tilgangResult.isDeny) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
         }
     }
