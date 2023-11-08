@@ -101,7 +101,7 @@ class AuthService(
 
     companion object {
         const val ROLLE_MODIA_ADMIN = "0000-GA-Modia_Admin"
-        val ACCEPTLIST_AZURE_SYSTEM_USERS = listOf("veilarbfilter")
+        val ACCEPTLIST_AZURE_SYSTEM_USERS = listOf("veilarbfilter", "veilarbportefolje")
         private fun getStringClaimOrEmpty(claims: JWTClaimsSet, claimName: String): Optional<String> {
             return try {
                 Optional.ofNullable(claims.getStringClaim(claimName))
