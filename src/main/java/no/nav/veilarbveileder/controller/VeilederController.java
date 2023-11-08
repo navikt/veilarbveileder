@@ -42,7 +42,7 @@ public class VeilederController {
 
     @GetMapping("/enheter/{veilederIdent}")
     public IdentOgEnhetliste hentEnheter(@PathVariable("veilederIdent") NavIdent veilederIdent) {
-        if (!authService.erSystemBruker()) {
+        if (!authService.erSystemBrukerFraAzureAd()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til oppfølging");
         }
 
