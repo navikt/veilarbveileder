@@ -58,6 +58,8 @@ public class EnhetController {
     public List<NavIdent> hentIdenter(@PathVariable("enhetId") EnhetId enhetId) {
         if(authService.erSystemBrukerFraAzureAd() && authService.erGodkjentAzureAdSystembruker()){
             return veilederOgEnhetService.hentIdentListe(enhetId);
+        } else if (authService.erSystemBruker() ) {
+            authService.sjekkTilgangTilOppfolging();
         } else {
             authService.sjekkTilgangTilModia();
         }
