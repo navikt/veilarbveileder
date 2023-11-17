@@ -77,6 +77,9 @@ spec:
         - application: mulighetsrommet-api
           namespace: team-mulighetsrommet
           cluster: dev-gcp
+        - application: arbeidssokerregistrering-for-veileder
+          namespace: paw
+          cluster: dev-gcp
   envFrom:
     - configmap: pto-config
   env:
