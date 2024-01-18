@@ -6,7 +6,7 @@ metadata:
   labels:
     team: pto
 spec:
-  image: ghcr.io/navikt/veilarbveileder/veilarbveileder:{{version}}
+  image: {{image}}
   port: 8080
   webproxy: true
   secureLogs:
