@@ -20,8 +20,8 @@
 
     <properties>
         <java.version>17</java.version>
-        <common.version>3.2023.03.22_12.48-00fcbdc8f455</common.version>
-        <kotlin.version>1.9.10</kotlin.version>
+        <common.version>3.2023.10.23_12.41-bafec3836d28</common.version>
+        <kotlin.version>1.9.22</kotlin.version>
     </properties>
 
     <build>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.11.0</version>
+            <version>4.12.0</version>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
