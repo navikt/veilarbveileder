@@ -74,8 +74,8 @@ public class VeilederController {
         return veilederOgEnhetService.hentVeilederData(ident);
     }
 
-    @PostMapping("/hent-navn/{ident}")
-    public String hentVeilederNavn(@PathVariable("ident") NavIdent ident) {
+    @PostMapping("/hent-navn")
+    public String hentVeilederNavn(@RequestBody NavIdent ident) {
         if(authService.erSystemBrukerFraAzureAd() && authService.erGodkjentAzureAdSystembruker()){
             return veilederOgEnhetService.hentVeilederData(ident).getNavn();
         }
