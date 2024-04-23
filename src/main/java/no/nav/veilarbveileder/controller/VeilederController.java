@@ -74,4 +74,15 @@ public class VeilederController {
         return veilederOgEnhetService.hentVeilederData(ident);
     }
 
+    @PostMapping("/hent-navn")
+    public String hentVeilederNavn(@RequestBody NavIdent ident) {
+        if(authService.erSystemBrukerFraAzureAd() && authService.erGodkjentAzureAdSystembruker()){
+            return veilederOgEnhetService.hentVeilederData(ident).getNavn();
+        }
+        else {
+            authService.sjekkTilgangTilModia();
+            return veilederOgEnhetService.hentVeilederData(ident).getNavn();
+        }
+    }
+
 }
