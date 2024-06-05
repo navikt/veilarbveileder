@@ -19,7 +19,7 @@
     <description>API for uthenting av veilederinformasjon</description>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <common.version>3.2023.10.23_12.41-bafec3836d28</common.version>
         <kotlin.version>1.9.22</kotlin.version>
     </properties>
@@ -52,7 +52,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <jvmTarget>17</jvmTarget>
+                    <jvmTarget>21</jvmTarget>
                     <compilerPlugins>
                         <plugin>spring</plugin>
                     </compilerPlugins>
@@ -161,7 +161,7 @@
         <dependency>
             <groupId>com.github.navikt.poao-tilgang</groupId>
             <artifactId>client</artifactId>
-            <version>2023.10.09_13.45-b5ace74e861a</version>
+            <version>2024.03.04_10.19-63a652788672</version>
         </dependency>
 
         <dependency>
@@ -173,6 +173,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.32</version>
             <optional>true</optional>
         </dependency>
         <dependency>
