@@ -61,7 +61,7 @@ spec:
           cluster: dev-gcp
         - application: veilarbfilter
           namespace: pto
-          cluster: dev-fss
+          cluster: dev-gcp
         - application: veilarbportefolje
           namespace: pto
           cluster: dev-fss
