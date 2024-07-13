@@ -60,7 +60,7 @@ spec:
           namespace: obo
           cluster: dev-gcp
         - application: veilarbfilter
-          namespace: pto
+          namespace: obo
           cluster: dev-gcp
         - application: veilarbportefolje
           namespace: pto
