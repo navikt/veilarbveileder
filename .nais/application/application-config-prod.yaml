@@ -58,8 +58,8 @@ spec:
           namespace: obo
           cluster: prod-gcp
         - application: veilarbfilter
-          namespace: pto
-          cluster: prod-fss
+          namespace: obo
+          cluster: prod-gcp
         - application: veilarbportefolje
           namespace: pto
           cluster: prod-fss
