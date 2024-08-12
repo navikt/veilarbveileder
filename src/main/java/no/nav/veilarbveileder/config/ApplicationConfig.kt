@@ -18,7 +18,6 @@ import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
 import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
 import no.nav.common.utils.EnvironmentUtils
-import no.nav.common.utils.UrlUtils
 import no.nav.poao_tilgang.client.PoaoTilgangCachedClient
 import no.nav.poao_tilgang.client.PoaoTilgangClient
 import no.nav.poao_tilgang.client.PoaoTilgangHttpClient
@@ -52,8 +51,7 @@ class ApplicationConfig {
     }
 
     @Bean
-    fun axsysClient(): AxsysClient {
-        val url = UrlUtils.createServiceUrl("axsys", "org", false)
+    fun axsysClient(properties: EnvironmentProperties): AxsysClient {
         val hentAnsatteCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .maximumSize(500)
@@ -62,7 +60,7 @@ class ApplicationConfig {
             .expireAfterWrite(30, TimeUnit.MINUTES)
             .maximumSize(10000)
             .build<NavIdent, List<AxsysEnhet>>()
-        return CachedAxsysClient(AxsysClientImpl(url), hentTilgangerCache, hentAnsatteCache)
+        return CachedAxsysClient(AxsysClientImpl(properties.axsysUrl), hentTilgangerCache, hentAnsatteCache)
     }
 
 

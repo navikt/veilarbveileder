@@ -9,5 +9,6 @@ data class EnvironmentProperties (
     val naisAadClientId: String,
     val norg2Url: String,
     val poaoTilgangUrl: String,
-    val poaoTilgangScope: String
+    val poaoTilgangScope: String,
+    val axsysUrl: String
 )
