@@ -63,6 +63,9 @@ spec:
         - application: veilarbportefolje
           namespace: pto
           cluster: prod-fss
+        - application: veilarbportefolje
+          namespace: obo
+          cluster: prod-gcp
         - application: veilarbpersonflate
           namespace: poao
           cluster: prod-gcp
