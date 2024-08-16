@@ -22,16 +22,12 @@ import no.nav.common.utils.UrlUtils
 import no.nav.poao_tilgang.client.PoaoTilgangCachedClient
 import no.nav.poao_tilgang.client.PoaoTilgangClient
 import no.nav.poao_tilgang.client.PoaoTilgangHttpClient
-import no.nav.veilarbveileder.client.LdapClient
-import no.nav.veilarbveileder.client.LdapClientImpl
 import no.nav.veilarbveileder.utils.DevNomClient
-import no.nav.veilarbveileder.utils.ServiceUserUtils
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 
-import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
@@ -80,11 +76,6 @@ class ApplicationConfig {
                 properties.poaoTilgangUrl,
                 { tokenClient.createMachineToMachineToken(properties.poaoTilgangScope) })
         )
-    }
-
-    @Bean
-    fun ldapClient(): LdapClient {
-        return LdapClientImpl()
     }
 
     @Bean
