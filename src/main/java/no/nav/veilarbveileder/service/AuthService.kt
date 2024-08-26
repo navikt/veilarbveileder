@@ -5,8 +5,12 @@ import lombok.extern.slf4j.Slf4j
 import no.nav.common.auth.context.AuthContextHolder
 import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
-import no.nav.poao_tilgang.client.*
-import no.nav.veilarbveileder.client.LdapClient
+import no.nav.poao_tilgang.client.NavAnsattTilgangTilModiaAdminPolicyInput
+import no.nav.poao_tilgang.client.NavAnsattTilgangTilModiaPolicyInput
+import no.nav.poao_tilgang.client.NavAnsattTilgangTilNavEnhetPolicyInput
+import no.nav.poao_tilgang.client.PoaoTilgangClient
+import no.nav.veilarbveileder.config.CacheConfig
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -17,21 +21,13 @@ import java.util.*
 @Slf4j
 class AuthService(
     private val authContextHolder: AuthContextHolder,
-    private val poaoTilgangClient: PoaoTilgangClient,
-    private val ldapClient: LdapClient) {
+    private val poaoTilgangClient: PoaoTilgangClient
+) {
     val innloggetVeilederIdent: NavIdent
         get() = authContextHolder.navIdent.orElseThrow {
             ResponseStatusException(
                 HttpStatus.UNAUTHORIZED,
                 "NAV ident is missing"
-            )
-        }
-
-    val innloggetBrukerToken: String
-        get() = authContextHolder.idTokenString.orElseThrow {
-            ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Token is missing"
             )
         }
 
@@ -62,8 +58,12 @@ class AuthService(
         }
     }
 
-    fun harModiaAdminRolle(ident: NavIdent?): Boolean {
-        return ldapClient.veilederHarRolle(ident, ROLLE_MODIA_ADMIN)
+    @Cacheable(CacheConfig.VEILEDER_ROLLE_CACHE_NAME)
+    fun harModiaAdminRolle(): Boolean {
+        val tilgangResult = poaoTilgangClient.evaluatePolicy(
+            NavAnsattTilgangTilModiaAdminPolicyInput(hentInnloggetVeilederUUID())
+        ).getOrThrow()
+        return tilgangResult.isPermit
     }
 
     fun erSystemBrukerFraAzureAd(): Boolean {

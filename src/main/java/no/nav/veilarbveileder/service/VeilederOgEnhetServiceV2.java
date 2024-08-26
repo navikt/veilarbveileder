@@ -27,7 +27,7 @@ public class VeilederOgEnhetServiceV2 implements VeilederOgEnhetService {
 
     @Override
     public List<PortefoljeEnhet> hentEnhetListe(NavIdent navIdent) {
-        if (authService.harModiaAdminRolle(navIdent)) {
+        if (authService.harModiaAdminRolle()) {
             log.info("Rollen {} ble brukt for ident: {}", ROLLE_MODIA_ADMIN, navIdent);
             return enhetService.alleEnheter();
         }
