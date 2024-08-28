@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.2</version>
         <relativePath/>
     </parent>
 
@@ -30,6 +30,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${project.parent.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -159,9 +160,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.navikt.poao-tilgang</groupId>
+            <groupId>no.nav.poao-tilgang</groupId>
             <artifactId>client</artifactId>
-            <version>2024.03.04_10.19-63a652788672</version>
+            <version>2024.08.16_08.05-cb75bb5cbe10</version>
         </dependency>
 
         <dependency>
@@ -173,7 +174,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.32</version>
+            <version>1.18.34</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -211,6 +212,10 @@
         <repository>
             <id>jitpack</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>github</id>
+            <url>https://github-package-registry-mirror.gc.nav.no/cached/maven-release</url>
         </repository>
     </repositories>
 </project>

@@ -63,6 +63,9 @@ spec:
         - application: veilarbportefolje
           namespace: pto
           cluster: prod-fss
+        - application: veilarbportefolje
+          namespace: obo
+          cluster: prod-gcp
         - application: veilarbpersonflate
           namespace: poao
           cluster: prod-gcp
@@ -81,16 +84,6 @@ spec:
   envFrom:
     - configmap: pto-config
   env:
-    - name: LDAP_BASEDN
-      value: dc=adeo,dc=no
-    - name: LDAP_USER_BASEDN
-      value: ou=NAV,ou=BusinessUnits,dc=adeo,dc=no
-    - name: LDAP_SERVICEUSER_BASEDN
-      value: ou=ServiceAccounts,dc=adeo,dc=no
-    - name: LDAP_URL
-      value: ldaps://ldapgw.adeo.no
-    - name: LDAP_DOMAIN
-      value: ADEO.NO
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao.svc.nais.local
     - name: POAO_TILGANG_SCOPE
