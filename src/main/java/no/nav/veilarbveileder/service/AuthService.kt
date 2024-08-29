@@ -9,8 +9,6 @@ import no.nav.poao_tilgang.client.NavAnsattTilgangTilModiaAdminPolicyInput
 import no.nav.poao_tilgang.client.NavAnsattTilgangTilModiaPolicyInput
 import no.nav.poao_tilgang.client.NavAnsattTilgangTilNavEnhetPolicyInput
 import no.nav.poao_tilgang.client.PoaoTilgangClient
-import no.nav.veilarbveileder.config.CacheConfig
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -58,7 +56,6 @@ class AuthService(
         }
     }
 
-    @Cacheable(CacheConfig.VEILEDER_ROLLE_CACHE_NAME)
     fun harModiaAdminRolle(): Boolean {
         val tilgangResult = poaoTilgangClient.evaluatePolicy(
             NavAnsattTilgangTilModiaAdminPolicyInput(hentInnloggetVeilederUUID())
