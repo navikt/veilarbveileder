@@ -93,3 +93,5 @@ spec:
       value: http://poao-tilgang.poao.svc.nais.local
     - name: POAO_TILGANG_SCOPE
       value: api://dev-fss.poao.poao-tilgang/.default
+    - name: NORG2_URL
+      value: https://app-q1.adeo.no/norg2
