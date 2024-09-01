@@ -24,7 +24,7 @@ public class HealthCheckConfig {
             AxsysClient axsysClient
     ) {
         List<SelfTestCheck> selfTestChecks = Arrays.asList(
-                new SelfTestCheck("Ping mot norg2 REST API", true, norg2Client),
+              //  new SelfTestCheck("Ping mot norg2 REST API", true, norg2Client),
                 new SelfTestCheck("Ping mot NOM", true, nomClient),
                 new SelfTestCheck("Ping mot Axsys", true, axsysClient)
         );

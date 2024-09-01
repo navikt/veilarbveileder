@@ -94,4 +94,4 @@ spec:
     - name: POAO_TILGANG_SCOPE
       value: api://dev-fss.poao.poao-tilgang/.default
     - name: NORG2_URL
-      value: https://norg2.intern.dev.nav.no/norg2
+      value: https://app-q1.adeo.no/norg2
