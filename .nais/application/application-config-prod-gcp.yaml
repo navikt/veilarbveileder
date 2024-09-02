@@ -78,8 +78,9 @@ spec:
       rules:
         - application: poao-tilgang
           namespace: poao
+        - application: norg2
+          namespace: org
       external:
-        - host: norg2.prod-fss-pub.nais.io
         - host: axsys.prod-fss-pub.nais.io
   env:
     - name: POAO_TILGANG_URL
@@ -87,6 +88,6 @@ spec:
     - name: POAO_TILGANG_SCOPE
       value: api://prod-gcp.poao.poao-tilgang/.default
     - name: NORG2_URL
-      value: https://app.adeo.no/norg2
+      value: http://norg2.org/norg2
     - name: AXSYS_URL
       value: https://axsys.prod-fss-pub.nais.io
