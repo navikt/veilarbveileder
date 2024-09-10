@@ -44,18 +44,12 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: paw-proxy
-          namespace: paw
-          cluster: dev-fss
         - application: veilarbportefoljeflatefs
           namespace: obo
           cluster: dev-gcp
         - application: veilarbfilter
           namespace: obo
           cluster: dev-gcp
-        - application: veilarbportefolje
-          namespace: pto
-          cluster: dev-fss
         - application: veilarbportefolje
           namespace: obo
           cluster: dev-gcp

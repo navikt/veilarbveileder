@@ -1,7 +1,6 @@
 name: Deploy til Dev-GCP
 on:
   workflow_dispatch:
-  pull_request:
 env:
   IMAGE_TAG: ${{ github.sha }}
   PRINT_PAYLOAD: true
