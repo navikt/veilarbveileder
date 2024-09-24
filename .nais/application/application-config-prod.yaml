@@ -90,3 +90,7 @@ spec:
       value: api://prod-fss.poao.poao-tilgang/.default
     - name: AXSYS_URL
       value: http://axsys.org.svc.nais.local
+    - name: NOM_API_URL
+      value: https://nom-api.intern.nav.no
+    - name: NOM_API_SCOPE
+      value: api://prod-gcp.nom.nom-api/.default
