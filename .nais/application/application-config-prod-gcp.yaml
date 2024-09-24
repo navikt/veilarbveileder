@@ -87,6 +87,6 @@ spec:
     - name: AXSYS_URL
       value: https://axsys.prod-fss-pub.nais.io
     - name: NOM_API_URL
-      value: https://nom-api.intern.nav.no
+      value: http://nom-api.nom
     - name: NOM_API_SCOPE
       value: api://prod-gcp.nom.nom-api/.default
