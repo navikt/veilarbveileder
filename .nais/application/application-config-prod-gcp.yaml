@@ -73,6 +73,8 @@ spec:
           namespace: poao
         - application: norg2
           namespace: org
+        - application: nom-api
+          namespace: nom
       external:
         - host: axsys.prod-fss-pub.nais.io
   env:
@@ -84,3 +86,7 @@ spec:
       value: http://norg2.org/norg2
     - name: AXSYS_URL
       value: https://axsys.prod-fss-pub.nais.io
+    - name: NOM_API_URL
+      value: https://nom-api.intern.nav.no
+    - name: NOM_API_SCOPE
+      value: api://prod-gcp.nom.nom-api/.default

@@ -82,13 +82,13 @@ class ApplicationConfig {
     }
 
     @Bean
-    fun nomClient(tokenClient: AzureAdMachineToMachineTokenClient): NomClient {
+    fun nomClient(tokenClient: AzureAdMachineToMachineTokenClient, environmentProperties: EnvironmentProperties): NomClient {
         if (EnvironmentUtils.isDevelopment().orElse(false)) {
             return DevNomClient()
         }
         val serviceTokenSupplier =
-            Supplier { tokenClient.createMachineToMachineToken("api://prod-gcp.nom.nom-api/.default") }
-        return CachedNomClient(NomClientImpl("https://nom-api.intern.nav.no", serviceTokenSupplier))
+            Supplier { tokenClient.createMachineToMachineToken(environmentProperties.nomApiScope) }
+        return CachedNomClient(NomClientImpl(environmentProperties.nomApiUrl, serviceTokenSupplier))
     }
 
     companion object {
