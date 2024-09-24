@@ -9,5 +9,7 @@ data class EnvironmentProperties (
     val norg2Url: String,
     val poaoTilgangUrl: String,
     val poaoTilgangScope: String,
-    val axsysUrl: String
+    val axsysUrl: String,
+    val nomApiUrl: String,
+    val nomApiScope: String,
 )
