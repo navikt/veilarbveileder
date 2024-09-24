@@ -2,9 +2,9 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: veilarbveileder
-  namespace: pto
+  namespace: obo
   labels:
-    team: pto
+    team: obo
 spec:
   image: {{image}}
   port: 8080
@@ -26,23 +26,12 @@ spec:
     cpuThresholdPercentage: 75
   resources:
     limits:
-      cpu: "2"
       memory: 2048Mi
     requests:
       cpu: 500m
       memory: 1024Mi
   ingresses:
-    - https://veilarbveileder.dev-fss-pub.nais.io
-    - https://veilarbveileder.dev.intern.nav.no
-    - https://veilarbveileder-q1.nais.preprod.local
-    - https://app-q1.dev.adeo.no/veilarbveileder
-    - https://app.dev.adeo.no/veilarbveileder
-    - https://app-q1.adeo.no/veilarbveileder
-  vault:
-    enabled: true
-    paths:
-      - kvPath: /kv/preprod/fss/veilarbveileder/q1
-        mountPath: /var/run/secrets/nais.io/vault
+    - https://veilarbveileder-gcp.intern.dev.nav.no
   azure:
     application:
       allowAllUsers: true
@@ -54,17 +43,12 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: paw-proxy
-          namespace: paw
         - application: veilarbportefoljeflatefs
           namespace: obo
           cluster: dev-gcp
         - application: veilarbfilter
           namespace: obo
           cluster: dev-gcp
-        - application: veilarbportefolje
-          namespace: pto
-          cluster: dev-fss
         - application: veilarbportefolje
           namespace: obo
           cluster: dev-gcp
@@ -74,6 +58,9 @@ spec:
         - application: beslutteroversikt
           namespace: obo
           cluster: dev-gcp
+        - application: veilarbvedtaksstotte
+          namespace: pto
+          cluster: dev-fss
         - application: veilarbvedtaksstotte
           namespace: obo
           cluster: dev-gcp
@@ -86,12 +73,20 @@ spec:
         - application: azure-token-generator
           namespace: aura
           cluster: dev-gcp
-  envFrom:
-    - configmap: pto-config
+    outbound:
+      rules:
+        - application: poao-tilgang
+          namespace: poao
+        - application: norg2
+          namespace: org
+      external:
+        - host: axsys.dev-fss-pub.nais.io
   env:
     - name: POAO_TILGANG_URL
-      value: http://poao-tilgang.poao.svc.nais.local
+      value: http://poao-tilgang.poao
     - name: POAO_TILGANG_SCOPE
-      value: api://dev-fss.poao.poao-tilgang/.default
+      value: api://dev-gcp.poao.poao-tilgang/.default
+    - name: NORG2_URL
+      value: http://norg2.org/norg2
     - name: AXSYS_URL
-      value: http://axsys.org.svc.nais.local
+      value: https://axsys.dev-fss-pub.nais.io

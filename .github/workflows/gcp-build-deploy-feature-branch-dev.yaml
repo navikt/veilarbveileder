@@ -1,0 +1,54 @@
+name: Deploy til Dev-GCP
+on:
+  workflow_dispatch:
+env:
+  IMAGE_TAG: ${{ github.sha }}
+  PRINT_PAYLOAD: true
+permissions:
+  packages: write 
+  contents: write
+jobs:
+  test-build-and-push:
+    name: Build and push
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build maven artifacts
+        run: mvn -B package
+
+      - name: Build and push Docker image
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: obo
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+
+  deploy-dev:
+    name: Deploy application to dev-gcp
+    needs: test-build-and-push
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy application
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/application/application-config-dev-gcp.yaml
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}

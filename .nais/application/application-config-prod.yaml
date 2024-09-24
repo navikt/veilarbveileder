@@ -88,3 +88,5 @@ spec:
       value: http://poao-tilgang.poao.svc.nais.local
     - name: POAO_TILGANG_SCOPE
       value: api://prod-fss.poao.poao-tilgang/.default
+    - name: AXSYS_URL
+      value: http://axsys.org.svc.nais.local
