@@ -61,9 +61,6 @@ spec:
         - application: veilarbvedtaksstotte
           namespace: pto
           cluster: prod-fss
-        - application: mulighetsrommet-api
-          namespace: team-mulighetsrommet
-          cluster: prod-gcp
         - application: arbeidssokerregistrering-for-veileder
           namespace: paw
           cluster: prod-gcp
