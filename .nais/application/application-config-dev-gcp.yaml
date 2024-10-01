@@ -64,9 +64,6 @@ spec:
         - application: veilarbvedtaksstotte
           namespace: obo
           cluster: dev-gcp
-        - application: mulighetsrommet-api
-          namespace: team-mulighetsrommet
-          cluster: dev-gcp
         - application: arbeidssokerregistrering-for-veileder
           namespace: paw
           cluster: dev-gcp
