@@ -67,6 +67,8 @@ spec:
         - application: arbeidssokerregistrering-for-veileder
           namespace: paw
           cluster: prod-gcp
+        - application: inngar
+          namespace: dab
     outbound:
       rules:
         - application: poao-tilgang
