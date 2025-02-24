@@ -1,5 +1,6 @@
 package no.nav.veilarbveileder.mock
 
+import no.nav.poao_tilgang.api.dto.response.TilgangsattributterResponse
 import no.nav.poao_tilgang.client.*
 import no.nav.poao_tilgang.client.api.ApiResult
 import java.util.*
@@ -25,4 +26,7 @@ class PoaoTilgangClientMock : PoaoTilgangClient {
         TODO("Not yet implemented")
     }
 
+    override fun hentTilgangsAttributter(norskIdent: NorskIdent): ApiResult<TilgangsattributterResponse> {
+        TODO("Not yet implemented")
+    }
 }
