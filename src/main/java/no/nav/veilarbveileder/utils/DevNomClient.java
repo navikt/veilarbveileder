@@ -35,7 +35,7 @@ public class DevNomClient implements NomClient {
                 .setNavIdent(navIdent)
                 .setFornavn("F_" + identNr)
                 .setEtternavn("E_" + identNr)
-                .setVisningsNavn("E_" + identNr + ", F_" + identNr );
+                .setVisningsNavn("F_" + identNr + " E_" + identNr);
     }
 
 }
