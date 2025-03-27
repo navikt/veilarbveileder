@@ -21,15 +21,15 @@ spec:
     enabled: true
     path: veilarbveileder/internal/prometheus
   replicas:
-    min: 2
+    min: 1
     max: 4
     cpuThresholdPercentage: 75
   resources:
     limits:
-      memory: 2048Mi
+      memory: 1536Mi
     requests:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: 200m
+      memory: 768Mi #https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   ingresses:
     - https://veilarbveileder-gcp.intern.nav.no
   azure:
