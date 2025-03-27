@@ -3,14 +3,11 @@ on: push
 env:
   IMAGE_TAG: ${{ github.sha }}
   PRINT_PAYLOAD: true
-permissions:
-  packages: write 
-  contents: write
 jobs:
   test:
     name: Run tests
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/master'
+    if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,8 +16,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'temurin'
-          cache: 'maven'
+          distribution: temurin
+          cache: maven
 
       - name: Run maven tests
         run: mvn -B verify
@@ -28,7 +25,7 @@ jobs:
   test-build-and-push:
     name: Test, build and push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
     permissions:
@@ -41,8 +38,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'temurin'
-          cache: 'maven'
+          distribution: temurin
+          cache: maven
 
       - name: Build maven artifacts
         run: mvn -B package
@@ -52,34 +49,13 @@ jobs:
         id: docker-build-push
         with:
           team: obo
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-
-  deploy-dev:
-    name: Deploy application to dev i gcp
-    if: github.ref == 'refs/heads/dev'
-    needs: test-build-and-push
-    permissions:
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy application
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-gcp
-          RESOURCE: .nais/application/application-config-dev-gcp.yaml
-          VAR: image=${{ needs.test-build-and-push.outputs.image }}
 
   deploy-prod:
-    name: Deploy application to prod i gcp
-    if: github.ref == 'refs/heads/master'
+    name: Deploy application to prod-gcp
+    if: github.ref == 'refs/heads/main'
     needs: test-build-and-push
     permissions:
-      packages: write
-      contents: write
+      contents: write  # Create release
       id-token: write
     runs-on: ubuntu-latest
     steps:
@@ -97,6 +73,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: Release to prod
-          target_commitish: master
+          target_commitish: main
           tag_name: release/prod@${{ env.IMAGE_TAG }}
           prerelease: false

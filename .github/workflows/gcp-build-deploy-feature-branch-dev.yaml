@@ -4,9 +4,6 @@ on:
 env:
   IMAGE_TAG: ${{ github.sha }}
   PRINT_PAYLOAD: true
-permissions:
-  packages: write 
-  contents: write
 jobs:
   test-build-and-push:
     name: Build and push
@@ -23,8 +20,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'temurin'
-          cache: 'maven'
+          distribution: temurin
+          cache: maven
 
       - name: Build maven artifacts
         run: mvn -B package

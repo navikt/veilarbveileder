@@ -8,9 +8,14 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/.github/workflows"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
 
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/"
     schedule:
       interval: "weekly"
