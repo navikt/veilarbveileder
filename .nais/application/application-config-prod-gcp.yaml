@@ -9,6 +9,11 @@ spec:
   image: {{image}}
   port: 8080
   webproxy: true
+  observability:
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
   secureLogs:
     enabled: true
   liveness:
