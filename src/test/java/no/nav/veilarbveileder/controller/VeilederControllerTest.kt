@@ -6,6 +6,7 @@ import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.json.JsonUtils
+import no.nav.veilarbveileder.client.MicrosoftGraphClient
 import no.nav.veilarbveileder.config.ApplicationTestConfig
 import no.nav.veilarbveileder.config.EnvironmentConfig
 import no.nav.veilarbveileder.domain.Veileder
@@ -52,6 +53,9 @@ class VeilederControllerTest {
 
     @MockBean
     lateinit var axsysClient: AxsysClient
+
+    @MockBean
+    lateinit var microsoftGraphClient: MicrosoftGraphClient
 
     @Autowired
     lateinit var nomClient: NomClient

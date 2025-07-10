@@ -10,6 +10,7 @@ import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.axsys.AxsysClientImpl
 import no.nav.common.client.axsys.AxsysEnhet
 import no.nav.common.client.axsys.CachedAxsysClient
+import no.nav.common.client.msgraph.MsGraphClient
 import no.nav.common.client.nom.CachedNomClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.nom.NomClientImpl
@@ -17,6 +18,7 @@ import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.client.norg2.NorgHttp2Client
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
+import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient
 import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
 import no.nav.common.utils.EnvironmentUtils
@@ -47,6 +49,12 @@ class ApplicationConfig {
         return AzureAdTokenClientBuilder.builder()
             .withNaisDefaults()
             .buildMachineToMachineTokenClient()
+    }
+    @Bean
+    fun azureAdOnBehalfOfTokenClient(): AzureAdOnBehalfOfTokenClient {
+        return AzureAdTokenClientBuilder.builder()
+            .withNaisDefaults()
+            .buildOnBehalfOfTokenClient();
     }
 
     @Bean
