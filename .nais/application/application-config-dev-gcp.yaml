@@ -85,6 +85,7 @@ spec:
           namespace: org
       external:
         - host: axsys.dev-fss-pub.nais.io
+        - host: team-obo-unleash-api.nav.cloud.nais.io
   env:
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao
@@ -94,3 +95,5 @@ spec:
       value: http://norg2.org/norg2
     - name: AXSYS_URL
       value: https://axsys.dev-fss-pub.nais.io
+  envFrom:
+    - secret: veilarbveileder-unleash-api-token
