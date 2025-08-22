@@ -32,8 +32,8 @@ class EnhetService(
 
     fun hentEnhet(enhetId: EnhetId): Optional<PortefoljeEnhet> {
         try {
-            val enhet = norg2Client.hentEnhet(enhetId.get())
-            return Optional.of(Mappers.tilPortefoljeEnhet(enhet))
+            val enhet: Enhet? = norg2Client.hentEnhet(enhetId.get())
+            return Optional.ofNullable(Mappers.tilPortefoljeEnhet(enhet))
         } catch (e: Exception) {
             logger.warn(String.format("Fant ikke enhet med id %s", enhetId), e)
             return Optional.empty()
@@ -42,9 +42,7 @@ class EnhetService(
 
     fun alleEnheter(): List<PortefoljeEnhet?> {
         return norg2Client.alleAktiveEnheter()
-            .stream()
             .map { enhet: Enhet? -> Mappers.tilPortefoljeEnhet(enhet) }
-            .collect(Collectors.toList())
     }
 
     fun veilederePaEnhet(enhetId: EnhetId?): List<NavIdent?>? {
