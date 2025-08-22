@@ -48,12 +48,6 @@ public class VeilederController {
         return new IdentOgEnhetliste(navIdent, response);
     }
 
-    @GetMapping("/enheter_ny")
-    public Set<AdGruppe> hentEnheterNy() {
-        authService.sjekkTilgangTilModia();
-        return microsoftGraphClient.hentAdGrupper(MicrosoftGraphClient.ENHET_FILTER_VALUE);
-    }
-
     @GetMapping("/enheter/{veilederIdent}")
     public IdentOgEnhetliste hentEnheter(@PathVariable("veilederIdent") NavIdent veilederIdent) {
         if (!authService.erSystemBrukerFraAzureAd()) {
