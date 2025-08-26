@@ -80,7 +80,7 @@ class MicrosoftGraphClientImpl(
             environmentProperties.microsoftGraphScope,
             authContextHolder.requireIdTokenString()
         )
-        val url = "${environmentProperties.microsoftGraphUri}/v1.0/me/memberOf"
+        val url = "${environmentProperties.microsoftGraphUri}/me/memberOf"
             .toHttpUrl()
             .newBuilder()
             .addQueryParameter(COUNT_PARAM_KEY, COUNT_PARAM_VALUE_TRUE)
