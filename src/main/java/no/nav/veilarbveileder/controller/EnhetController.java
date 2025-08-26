@@ -83,7 +83,7 @@ public class EnhetController {
         return veilederOgEnhetService.hentIdentListe(enhetId);
     }
 
-    @GetMapping("/{groupId}/veiledere")
+    @GetMapping("/{groupId}/azure-user-data")
     public List<UserData> hentAnsatte(@PathVariable("groupId") UUID groupId) {
         authService.sjekkTilgangTilModia();
 
