@@ -10,7 +10,9 @@ import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.axsys.AxsysClientImpl
 import no.nav.common.client.axsys.AxsysEnhet
 import no.nav.common.client.axsys.CachedAxsysClient
+import no.nav.common.client.msgraph.CachedMsGraphClient
 import no.nav.common.client.msgraph.MsGraphClient
+import no.nav.common.client.msgraph.MsGraphHttpClient
 import no.nav.common.client.nom.CachedNomClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.nom.NomClientImpl
@@ -54,7 +56,7 @@ class ApplicationConfig {
     fun azureAdOnBehalfOfTokenClient(): AzureAdOnBehalfOfTokenClient {
         return AzureAdTokenClientBuilder.builder()
             .withNaisDefaults()
-            .buildOnBehalfOfTokenClient();
+            .buildOnBehalfOfTokenClient()
     }
 
     @Bean
@@ -75,7 +77,16 @@ class ApplicationConfig {
         return CachedAxsysClient(AxsysClientImpl(properties.axsysUrl), hentTilgangerCache, hentAnsatteCache)
     }
 
-
+    @Bean
+    fun msGraphClient(
+        properties: EnvironmentProperties
+    ): MsGraphClient {
+        return CachedMsGraphClient(
+           MsGraphHttpClient (
+                properties.microsoftGraphUri
+            )
+        )
+    }
     @Bean
     fun poaoTilgangClient(
         properties: EnvironmentProperties,
