@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.common.client.msgraph.MsGraphClient;
 import no.nav.common.client.msgraph.UserData;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
-import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.common.types.identer.NavIdent;
 import no.nav.veilarbveileder.config.EnvironmentProperties;
@@ -84,10 +83,16 @@ public class EnhetController {
     }
 
     @GetMapping("/{groupId}/azure-user-data")
-    public List<UserData> hentAnsatte(@PathVariable("groupId") UUID groupId) {
+    public List<UserData> hentAnsatteByGroupId(@PathVariable("groupId") UUID groupId) {
         authService.sjekkTilgangTilModia();
 
         return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), groupId.toString());
+    }
+    @GetMapping("/{enhetId}/azure-user-data2")
+    public List<UserData> entAnsatteByEnhetId(@PathVariable("enhetId") EnhetId enhetId) {
+        authService.sjekkTilgangTilModia();
+
+        return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), enhetId.toString());
     }
 
 }
