@@ -92,7 +92,7 @@ public class EnhetController {
     public List<UserData> entAnsatteByEnhetId(@PathVariable("enhetId") EnhetId enhetId) {
         authService.sjekkTilgangTilModia();
 
-        return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), enhetId.toString());
+        return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), enhetId);
     }
 
 }
