@@ -5,19 +5,22 @@ import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.axsys.AxsysEnhet
+import no.nav.common.client.msgraph.MsGraphClient
 import no.nav.common.client.norg2.Enhet
 import no.nav.common.client.norg2.Norg2Client
+import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
 import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
 import no.nav.veilarbveileder.client.MicrosoftGraphClient
+import no.nav.veilarbveileder.config.EnvironmentProperties
 import no.nav.veilarbveileder.domain.PortefoljeEnhet
 import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import no.nav.veilarbveileder.utils.Mappers
+import no.nav.veilarbveileder.utils.SecureLog
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.lang.Integer.parseInt
 import java.util.*
-import java.util.stream.Collectors
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,9 @@ class EnhetService(
     private val norg2Client: Norg2Client,
     private val axsysClient: AxsysClient,
     private val microsoftGraphClient: MicrosoftGraphClient,
+    private val msGraphClient: MsGraphClient,
+    private val azureAdMachineToMachineTokenClient: AzureAdMachineToMachineTokenClient,
+    private val environmentProperties: EnvironmentProperties,
     private val defaultUnleash: DefaultUnleash
 ) {
     val logger = LoggerFactory.getLogger(javaClass)
@@ -46,7 +52,30 @@ class EnhetService(
     }
 
     fun veilederePaEnhet(enhetId: EnhetId?): List<NavIdent?>? {
-        return axsysClient.hentAnsatte(enhetId)
+        val ansatteFraAxsys = axsysClient.hentAnsatte(enhetId)
+        val ansatteFraMsGraph = msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope), enhetId)
+
+        return if (defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)) {
+            try {
+                val ansattNavIdenterFraADGrupper = ansatteFraMsGraph.map { it.onPremisesSamAccountName }.toSet()
+                val ansattNavIdenterFraAxsys = ansatteFraAxsys.toSet()
+
+                if (ansattNavIdenterFraAxsys == ansattNavIdenterFraADGrupper) {
+                    logger.info("Ansatte er identiske mellom Axsys og AD-grupper for enhet $enhetId.")
+                } else {
+                    logger.warn("Ansatte er ikke identiske mellom Axsys og AD-grupper for enhet $enhetId.")
+                }
+            } catch (e: Exception) {
+                logger.warn(
+                    "Kunne ikke hente ansatte fra MsGraph eller Axsys fra enhet: $enhetId, se Securelogs for detaljer.",
+                )
+                SecureLog.secureLog.warn("Kunne ikke hente ansatte fra MsGraph eller Axsys fra enhet: $enhetId", e)
+            }
+
+            ansatteFraAxsys
+        } else {
+            ansatteFraAxsys
+        }
     }
 
     fun hentTilganger(navIdent: NavIdent): List<PortefoljeEnhet?> {
