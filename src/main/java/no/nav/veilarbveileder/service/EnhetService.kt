@@ -53,7 +53,10 @@ class EnhetService(
 
     fun veilederePaEnhet(enhetId: EnhetId?): List<NavIdent?>? {
         val ansatteFraAxsys = axsysClient.hentAnsatte(enhetId)
-        val ansatteFraMsGraph = msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope), enhetId)
+        val ansatteFraMsGraph = msGraphClient.hentUserDataForGroup(
+            azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope),
+            enhetId
+        )
 
         return if (defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)) {
             try {
@@ -63,7 +66,13 @@ class EnhetService(
                 if (ansattNavIdenterFraAxsys == ansattNavIdenterFraADGrupper) {
                     logger.info("Ansatte er identiske mellom Axsys og AD-grupper for enhet $enhetId.")
                 } else {
+                    val (kunIAnsatteFraAxsys, kunIAnsatteFraADGrupper) = lagDifferanseSettForAnsatte(
+                        ansattNavIdenterFraAxsys,
+                        ansattNavIdenterFraADGrupper
+                    )
                     logger.warn("Ansatte er ikke identiske mellom Axsys og AD-grupper for enhet $enhetId.")
+                    SecureLog.secureLog.warn("Ansatte kun i Axsys for enhet $enhetId: $kunIAnsatteFraAxsys")
+                    SecureLog.secureLog.warn("Ansatte kun i AD-grupper for enhet $enhetId: $kunIAnsatteFraADGrupper")
                 }
             } catch (e: Exception) {
                 logger.warn(
@@ -116,6 +125,26 @@ class EnhetService(
         return microsoftGraphClient.hentAdGrupper()
             .map { tilEnhetId(it.displayName) }
             .toSet()
+    }
+
+    fun lagDifferanseSettForAnsatte(
+        ansattNavIdenterFraAxsys: Set<NavIdent?>,
+        ansattNavIdenterFraADGrupper: Set<String>
+    ): Pair<Set<NavIdent?>, Set<String>> {
+        // Convert NavIdent objects to strings for comparison
+        val ansattNavIdenterFraAxsysAsStrings = ansattNavIdenterFraAxsys.mapNotNull { it?.get() }.toSet()
+
+        // Find identifiers only in Axsys
+        val kunIAnsatteFraAxsys = ansattNavIdenterFraAxsys.filter { navIdent ->
+            navIdent?.get() !in ansattNavIdenterFraADGrupper
+        }.toSet()
+
+        // Find identifiers only in AD groups
+        val kunIAnsatteFraADGrupper = ansattNavIdenterFraADGrupper.filter {
+            it !in ansattNavIdenterFraAxsysAsStrings
+        }.toSet()
+
+        return Pair(kunIAnsatteFraAxsys, kunIAnsatteFraADGrupper)
     }
 
     companion object {
