@@ -89,7 +89,7 @@ public class EnhetController {
         return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), groupId.toString());
     }
     @GetMapping("/{enhetId}/azure-user-data2")
-    public List<UserData> entAnsatteByEnhetId(@PathVariable("enhetId") EnhetId enhetId) {
+    public List<UserData> hentAnsatteByEnhetId(@PathVariable("enhetId") EnhetId enhetId) {
         authService.sjekkTilgangTilModia();
 
         return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), enhetId);
