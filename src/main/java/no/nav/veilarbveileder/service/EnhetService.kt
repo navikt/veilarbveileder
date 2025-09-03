@@ -71,9 +71,11 @@ class EnhetService(
                         ansattNavIdenterFraADGrupper
                     )
                     logger.warn("Ansatte er ikke identiske mellom Axsys og AD-grupper for enhet $enhetId.")
-                    SecureLog.secureLog.warn("Ansatte kun i Axsys for enhet $enhetId: $kunIAnsatteFraAxsys")
+
+                    SecureLog.secureLog.warn("Svar fra Axsys for enhet $enhetId: ${ansatteFraAxsys.size} brukere")
                     SecureLog.secureLog.warn("Svar fra MsGraph for enhet $enhetId: ${ansatteFraMsGraph.size} brukere")
-                    SecureLog.secureLog.warn("Ansatte kun i AD-grupper for enhet $enhetId: $kunIAnsatteFraADGrupper")
+                    SecureLog.secureLog.warn("Antall ansatte kun i Axsys for enhet $enhetId: ${kunIAnsatteFraAxsys.size} brukere")
+                    SecureLog.secureLog.warn("Antall ansatte kun i AD-grupper for enhet $enhetId: ${kunIAnsatteFraADGrupper.size} brukere")
                 }
             } catch (e: Exception) {
                 logger.warn(
