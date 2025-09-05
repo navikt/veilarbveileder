@@ -12,6 +12,4 @@ data class EnvironmentProperties (
     val axsysUrl: String,
     val nomApiUrl: String,
     val nomApiScope: String,
-    val microsoftGraphUri: String,
-    val microsoftGraphScope: String
 )
