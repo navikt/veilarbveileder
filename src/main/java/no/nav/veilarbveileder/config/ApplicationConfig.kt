@@ -10,9 +10,6 @@ import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.axsys.AxsysClientImpl
 import no.nav.common.client.axsys.AxsysEnhet
 import no.nav.common.client.axsys.CachedAxsysClient
-import no.nav.common.client.msgraph.CachedMsGraphClient
-import no.nav.common.client.msgraph.MsGraphClient
-import no.nav.common.client.msgraph.MsGraphHttpClient
 import no.nav.common.client.nom.CachedNomClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.nom.NomClientImpl
@@ -20,7 +17,6 @@ import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.client.norg2.NorgHttp2Client
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
-import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient
 import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
 import no.nav.common.utils.EnvironmentUtils
@@ -52,12 +48,6 @@ class ApplicationConfig {
             .withNaisDefaults()
             .buildMachineToMachineTokenClient()
     }
-    @Bean
-    fun azureAdOnBehalfOfTokenClient(): AzureAdOnBehalfOfTokenClient {
-        return AzureAdTokenClientBuilder.builder()
-            .withNaisDefaults()
-            .buildOnBehalfOfTokenClient()
-    }
 
     @Bean
     fun norg2Client(properties: EnvironmentProperties): Norg2Client {
@@ -77,16 +67,7 @@ class ApplicationConfig {
         return CachedAxsysClient(AxsysClientImpl(properties.axsysUrl), hentTilgangerCache, hentAnsatteCache)
     }
 
-    @Bean
-    fun msGraphClient(
-        properties: EnvironmentProperties
-    ): MsGraphClient {
-        return CachedMsGraphClient(
-           MsGraphHttpClient (
-                properties.microsoftGraphUri
-            )
-        )
-    }
+
     @Bean
     fun poaoTilgangClient(
         properties: EnvironmentProperties,

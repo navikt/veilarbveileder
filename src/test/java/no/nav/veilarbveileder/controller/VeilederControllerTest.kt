@@ -2,12 +2,10 @@ package no.nav.veilarbveileder.controller
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import io.getunleash.DefaultUnleash
 import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.json.JsonUtils
-import no.nav.veilarbveileder.client.MicrosoftGraphClient
 import no.nav.veilarbveileder.config.ApplicationTestConfig
 import no.nav.veilarbveileder.config.EnvironmentConfig
 import no.nav.veilarbveileder.domain.Veileder
@@ -54,12 +52,6 @@ class VeilederControllerTest {
 
     @MockBean
     lateinit var axsysClient: AxsysClient
-
-    @MockBean
-    lateinit var microsoftGraphClient: MicrosoftGraphClient
-
-    @MockBean
-    lateinit var defaultUnleash: DefaultUnleash
 
     @Autowired
     lateinit var nomClient: NomClient
