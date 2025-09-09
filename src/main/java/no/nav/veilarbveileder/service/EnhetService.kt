@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.axsys.AxsysEnhet
+import no.nav.common.client.msgraph.AdGroupData
 import no.nav.common.client.msgraph.MsGraphClient
 import no.nav.common.client.norg2.Enhet
 import no.nav.common.client.norg2.Norg2Client
@@ -98,8 +99,11 @@ class EnhetService(
             // (vha. AD-grupper) måte å hente enhetstilganger på. Axsys er fortsatt "fasit".
             try {
                 val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper()
+                val adGrupperForNavIdent = hentTilgangerFraEntraId(navIdent)
                 val unikeEnhetTilgangerFraAxsys =
                     enhetTilgangerFraAxsys.map(PortefoljeEnhet::enhetId).toSet()
+
+                logger.info("Antall tilganger fra hentAdGroupsForUser ${adGrupperForNavIdent.size}")
 
                 if (unikeEnhetTilgangerFraAxsys == unikeEnhetTilgangerFraADGrupper) {
                     logger.info("Enhettilganger er identiske mellom Axsys og AD-grupper.")
@@ -122,6 +126,9 @@ class EnhetService(
     fun hentEnheterFraAxsys(navIdent: NavIdent): List<PortefoljeEnhet> {
         return axsysClient.hentTilganger(navIdent)
             .map { axsysEnhet: AxsysEnhet? -> Mappers.tilPortefoljeEnhet(axsysEnhet) }
+    }
+    fun hentTilgangerFraEntraId(navIdent: NavIdent): List<AdGroupData> {
+        return msGraphClient.hentAdGroupsForUser(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope),navIdent.toString())
     }
 
     fun hentEnhetTilgangerFraADGrupper(): Set<EnhetId> {
