@@ -9,6 +9,11 @@ spec:
   image: {{image}}
   port: 8080
   webproxy: true
+  observability:
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
   secureLogs:
     enabled: true
   liveness:
@@ -79,6 +84,7 @@ spec:
           namespace: nom
       external:
         - host: axsys.prod-fss-pub.nais.io
+        - host: team-obo-unleash-api.nav.cloud.nais.io
   env:
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao
@@ -88,7 +94,13 @@ spec:
       value: http://norg2.org/norg2
     - name: AXSYS_URL
       value: https://axsys.prod-fss-pub.nais.io
+    - name: MICROSOFT_GRAPH_URI
+      value: https://graph.microsoft.com/v1.0
+    - name: MICROSOFT_GRAPH_SCOPE
+      value: https://graph.microsoft.com/.default
     - name: NOM_API_URL
       value: http://nom-api.nom
     - name: NOM_API_SCOPE
       value: api://prod-gcp.nom.nom-api/.default
+  envFrom:
+    - secret: veilarbveileder-unleash-api-token

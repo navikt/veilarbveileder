@@ -1,8 +1,12 @@
 package no.nav.veilarbveileder.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.common.client.msgraph.MsGraphClient;
+import no.nav.common.client.msgraph.UserData;
+import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.common.types.identer.NavIdent;
+import no.nav.veilarbveileder.config.EnvironmentProperties;
 import no.nav.veilarbveileder.domain.PortefoljeEnhet;
 import no.nav.veilarbveileder.domain.VeiledereResponse;
 import no.nav.veilarbveileder.service.AuthService;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/enhet")
@@ -29,21 +34,33 @@ public class EnhetController {
 
     private final AuthService authService;
 
+    private final MsGraphClient msGraphClient;
+
+    private final AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient;
+
+    private final EnvironmentProperties environmentProperties;
+
     @Autowired
     public EnhetController(
             VeilederOgEnhetServiceV2 veilederOgEnhetService,
             EnhetService enhetService,
-            AuthService authService
+            AuthService authService,
+            MsGraphClient msGraphClient,
+            AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient,
+            EnvironmentProperties environmentProperties
     ) {
         this.veilederOgEnhetService = veilederOgEnhetService;
         this.enhetService = enhetService;
         this.authService = authService;
+        this.msGraphClient = msGraphClient;
+        this.azureAdMachineToMachineTokenClient = azureAdMachineToMachineTokenClient;
+        this.environmentProperties = environmentProperties;
     }
 
     @GetMapping("/{enhetId}/navn")
     public PortefoljeEnhet hentNavn(@PathVariable("enhetId") EnhetId enhetId) {
         return enhetService.hentEnhet(enhetId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/{enhetId}/veiledere")
@@ -56,13 +73,26 @@ public class EnhetController {
 
     @GetMapping("/{enhetId}/identer")
     public List<NavIdent> hentIdenter(@PathVariable("enhetId") EnhetId enhetId) {
-        if(authService.erSystemBrukerFraAzureAd() && authService.erGodkjentAzureAdSystembruker()){
+        if (authService.erSystemBrukerFraAzureAd() && authService.erGodkjentAzureAdSystembruker()) {
             return veilederOgEnhetService.hentIdentListe(enhetId);
         } else {
             authService.sjekkTilgangTilModia();
         }
 
         return veilederOgEnhetService.hentIdentListe(enhetId);
+    }
+
+    @GetMapping("/{groupId}/azure-user-data")
+    public List<UserData> hentAnsatteByGroupId(@PathVariable("groupId") UUID groupId) {
+        authService.sjekkTilgangTilModia();
+
+        return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), groupId.toString());
+    }
+    @GetMapping("/{enhetId}/azure-user-data2")
+    public List<UserData> hentAnsatteByEnhetId(@PathVariable("enhetId") EnhetId enhetId) {
+        authService.sjekkTilgangTilModia();
+
+        return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), enhetId);
     }
 
 }
