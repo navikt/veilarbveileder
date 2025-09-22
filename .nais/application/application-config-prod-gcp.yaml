@@ -94,6 +94,10 @@ spec:
       value: http://norg2.org/norg2
     - name: AXSYS_URL
       value: https://axsys.prod-fss-pub.nais.io
+    - name: MICROSOFT_GRAPH_URI
+      value: https://graph.microsoft.com/v1.0
+    - name: MICROSOFT_GRAPH_SCOPE
+      value: https://graph.microsoft.com/.default
     - name: NOM_API_URL
       value: http://nom-api.nom
     - name: NOM_API_SCOPE
