@@ -14,9 +14,9 @@ import no.nav.common.types.identer.NavIdent
 import no.nav.veilarbveileder.client.MicrosoftGraphClient
 import no.nav.veilarbveileder.config.EnvironmentProperties
 import no.nav.veilarbveileder.domain.PortefoljeEnhet
+import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
 import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import no.nav.veilarbveileder.utils.Mappers
-import no.nav.veilarbveileder.utils.SecureLog
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.lang.Integer.parseInt
@@ -52,41 +52,14 @@ class EnhetService(
     }
 
     fun veilederePaEnhet(enhetId: EnhetId?): List<NavIdent?>? {
-        val ansatteFraAxsys = axsysClient.hentAnsatte(enhetId)
-        val ansatteFraMsGraph = msGraphClient.hentUserDataForGroup(
-            azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope),
-            enhetId
-        )
+        return if (defaultUnleash.isEnabled(BRUK_VEILEDERE_PAA_ENHET_FRA_AD)) {
+            msGraphClient.hentUserDataForGroup(
+                azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope),
+                enhetId
+            ).map { NavIdent.of(it.onPremisesSamAccountName) }
 
-        return if (defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)) {
-            try {
-                val ansattNavIdenterFraADGrupper = ansatteFraMsGraph.map { it.onPremisesSamAccountName }.toSet()
-                val ansattNavIdenterFraAxsys = ansatteFraAxsys.toSet()
-
-                if (ansattNavIdenterFraAxsys == ansattNavIdenterFraADGrupper) {
-                    logger.info("Ansatte er identiske mellom Axsys og AD-grupper for enhet $enhetId.")
-                } else {
-                    val (kunIAnsatteFraAxsys, kunIAnsatteFraADGrupper) = lagDifferanseSettForAnsatte(
-                        ansattNavIdenterFraAxsys,
-                        ansattNavIdenterFraADGrupper
-                    )
-                    logger.warn("Ansatte er ikke identiske mellom Axsys og AD-grupper for enhet $enhetId.")
-
-                    SecureLog.secureLog.warn("Svar fra Axsys for enhet $enhetId: ${ansatteFraAxsys.size} brukere")
-                    SecureLog.secureLog.warn("Svar fra MsGraph for enhet $enhetId: ${ansatteFraMsGraph.size} brukere")
-                    SecureLog.secureLog.warn("Antall ansatte kun i Axsys for enhet $enhetId: ${kunIAnsatteFraAxsys.size} brukere")
-                    SecureLog.secureLog.warn("Antall ansatte kun i AD-grupper for enhet $enhetId: ${kunIAnsatteFraADGrupper.size} brukere")
-                }
-            } catch (e: Exception) {
-                logger.warn(
-                    "Kunne ikke hente ansatte fra MsGraph eller Axsys fra enhet: $enhetId, se Securelogs for detaljer.",
-                )
-                SecureLog.secureLog.warn("Kunne ikke hente ansatte fra MsGraph eller Axsys fra enhet: $enhetId", e)
-            }
-
-            ansatteFraAxsys
         } else {
-            ansatteFraAxsys
+          axsysClient.hentAnsatte(enhetId)
         }
     }
 
