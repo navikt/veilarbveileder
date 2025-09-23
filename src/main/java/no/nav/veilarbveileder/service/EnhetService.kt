@@ -103,26 +103,6 @@ class EnhetService(
             .toSet()
     }
 
-    fun lagDifferanseSettForAnsatte(
-        ansattNavIdenterFraAxsys: Set<NavIdent?>,
-        ansattNavIdenterFraADGrupper: Set<String>
-    ): Pair<Set<NavIdent?>, Set<String>> {
-        // Convert NavIdent objects to strings for comparison
-        val ansattNavIdenterFraAxsysAsStrings = ansattNavIdenterFraAxsys.mapNotNull { it?.get() }.toSet()
-
-        // Find identifiers only in Axsys
-        val kunIAnsatteFraAxsys = ansattNavIdenterFraAxsys.filter { navIdent ->
-            navIdent?.get() !in ansattNavIdenterFraADGrupper
-        }.toSet()
-
-        // Find identifiers only in AD groups
-        val kunIAnsatteFraADGrupper = ansattNavIdenterFraADGrupper.filter {
-            it !in ansattNavIdenterFraAxsysAsStrings
-        }.toSet()
-
-        return Pair(kunIAnsatteFraAxsys, kunIAnsatteFraADGrupper)
-    }
-
     companion object {
         private const val AD_GRUPPE_ENHET_PREFIKS = "0000-GA-ENHET_"
         private const val NAV_ENHET_ID_LENGDE = 4
