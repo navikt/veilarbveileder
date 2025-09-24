@@ -96,24 +96,17 @@ class EnhetServiceTest {
 
     @Test
     fun `alleEnheter returns mapped portefoljeEnheter`() {
-        // Mock the Enhet objects that would come from norg2Client
         val enhet1 = mock(Enhet::class.java)
         val enhet2 = mock(Enhet::class.java)
 
-        // Set up properties on mock PortefoljeEnhet objects
         `when`(enhet1.enhetNr).thenReturn("1234")
         `when`(enhet1.navn).thenReturn("Nav-kontor 1")
         `when`(enhet2.enhetNr).thenReturn("5678")
         `when`(enhet2.navn).thenReturn("Nav-kontor 2")
-
-        // Mock norg2Client.alleAktiveEnheter() to return our mock Enhet objects
         `when`(norg2Client.alleAktiveEnheter()).thenReturn(listOf(enhet1, enhet2))
 
-
-        // Call the method under test
         val result = enhetService.alleEnheter()
 
-        // Assert on the returned PortefoljeEnhet objects
         assertEquals(2, result.size)
         assertEquals(EnhetId.of("1234"), result[0]?.enhetId)
         assertEquals(EnhetId.of("5678"), result[1]?.enhetId)

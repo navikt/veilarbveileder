@@ -19,7 +19,6 @@ import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import no.nav.veilarbveileder.utils.Mappers
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.lang.Integer.parseInt
 import java.util.*
 
 @Service
@@ -117,13 +116,8 @@ class EnhetService(
         private fun tilValidertEnhetId(navEnhetId: String): EnhetId {
             if (navEnhetId.length != NAV_ENHET_ID_LENGDE) throw NavEnhetIdValideringException("Ugyldig lengde: ${navEnhetId.length}. Forventet: $NAV_ENHET_ID_LENGDE.")
             if (
-                try {
-                    parseInt(navEnhetId)
-                    false
-                } catch (_: NumberFormatException) {
-                    true
-                }
-            ) throw NavEnhetIdValideringException("Ugyldige tegn: ${navEnhetId.length}. Forventet: 4 siffer.")
+               !navEnhetId.all { it.isDigit() }
+            ) throw NavEnhetIdValideringException("Ugyldige tegn: ${navEnhetId}. Forventet: 4 siffer.")
 
             return EnhetId.of(navEnhetId)
         }
