@@ -19,6 +19,7 @@ import no.nav.veilarbveileder.domain.PortefoljeEnhet
 import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
 import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import no.nav.veilarbveileder.utils.Mappers
+import no.nav.veilarbveileder.utils.SecureLog
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
@@ -36,6 +37,7 @@ class EnhetService(
     private val defaultUnleash: DefaultUnleash
 ) {
     val logger = LoggerFactory.getLogger(javaClass)
+    val secureLog = SecureLog.secureLog
 
     fun hentEnhet(enhetId: EnhetId): Optional<PortefoljeEnhet> {
         try {
@@ -76,6 +78,7 @@ class EnhetService(
                 val unikeEnhetTilgangerFraAxsys =
                     enhetTilgangerFraAxsys.map(PortefoljeEnhet::enhetId).toSet()
 
+                secureLog.info("Svar fra hentAdGroupsForUser for $navIdent:  $adGrupperForNavIdent")
                 logger.info("Antall tilganger fra hentAdGroupsForUser ${adGrupperForNavIdent.size}")
                 if( adGrupperForNavIdent == unikeEnhetTilgangerFraADGrupper) {
                     logger.info("Enhettilganger er identiske mellom unikeEnhetTilgangerFraADGrupper og adGrupperForNavIdent(common-java-modules).")
