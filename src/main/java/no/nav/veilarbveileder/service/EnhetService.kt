@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.axsys.AxsysEnhet
-import no.nav.common.client.msgraph.AdGroupData
 import no.nav.common.client.msgraph.AdGroupFilter
 import no.nav.common.client.msgraph.MsGraphClient
 import no.nav.common.client.norg2.Enhet
@@ -79,6 +78,8 @@ class EnhetService(
                     enhetTilgangerFraAxsys.map(PortefoljeEnhet::enhetId).toSet()
 
                 secureLog.info("Svar fra hentAdGroupsForUser for $navIdent:  $adGrupperForNavIdent")
+                secureLog.info("Svar fra tilgangerFraAxsys for $navIdent:  $unikeEnhetTilgangerFraAxsys")
+                secureLog.info("Svar fra hentEnhetTilgangerFraADGrupper for $navIdent:  $unikeEnhetTilgangerFraADGrupper")
                 logger.info("Antall tilganger fra hentAdGroupsForUser ${adGrupperForNavIdent.size}")
                 if( adGrupperForNavIdent == unikeEnhetTilgangerFraADGrupper) {
                     logger.info("Enhettilganger er identiske mellom unikeEnhetTilgangerFraADGrupper og adGrupperForNavIdent(common-java-modules).")
@@ -108,8 +109,10 @@ class EnhetService(
         return axsysClient.hentTilganger(navIdent)
             .map { axsysEnhet: AxsysEnhet? -> Mappers.tilPortefoljeEnhet(axsysEnhet) }
     }
-    fun hentTilgangerFraEntraId(navIdent: NavIdent): List<AdGroupData> {
+    fun hentTilgangerFraEntraId(navIdent: NavIdent): Set<EnhetId> {
+
         return msGraphClient.hentAdGroupsForUser(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope),navIdent.toString(), AdGroupFilter.ENHET)
+            .map { tilEnhetId(it.displayName) }.toSet()
     }
 
     fun hentEnhetTilgangerFraADGrupper(): Set<EnhetId> {
