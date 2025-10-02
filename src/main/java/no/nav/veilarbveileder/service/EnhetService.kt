@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.axsys.AxsysEnhet
+import no.nav.common.client.msgraph.AdGroupFilter
 import no.nav.common.client.msgraph.MsGraphClient
 import no.nav.common.client.norg2.Enhet
 import no.nav.common.client.norg2.Norg2Client
@@ -17,6 +18,7 @@ import no.nav.veilarbveileder.domain.PortefoljeEnhet
 import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
 import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import no.nav.veilarbveileder.utils.Mappers
+import no.nav.veilarbveileder.utils.SecureLog
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
@@ -34,6 +36,7 @@ class EnhetService(
     private val defaultUnleash: DefaultUnleash
 ) {
     val logger = LoggerFactory.getLogger(javaClass)
+    val secureLog = SecureLog.secureLog
 
     fun hentEnhet(enhetId: EnhetId): Optional<PortefoljeEnhet> {
         try {
@@ -70,8 +73,19 @@ class EnhetService(
             // (vha. AD-grupper) måte å hente enhetstilganger på. Axsys er fortsatt "fasit".
             try {
                 val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper()
+                val adGrupperForNavIdent = hentTilgangerFraEntraId(navIdent)
                 val unikeEnhetTilgangerFraAxsys =
                     enhetTilgangerFraAxsys.map(PortefoljeEnhet::enhetId).toSet()
+
+                secureLog.info("Svar fra hentAdGroupsForUser for $navIdent:  $adGrupperForNavIdent")
+                secureLog.info("Svar fra tilgangerFraAxsys for $navIdent:  $unikeEnhetTilgangerFraAxsys")
+                secureLog.info("Svar fra hentEnhetTilgangerFraADGrupper for $navIdent:  $unikeEnhetTilgangerFraADGrupper")
+                logger.info("Antall tilganger fra hentAdGroupsForUser ${adGrupperForNavIdent.size}")
+                if( adGrupperForNavIdent == unikeEnhetTilgangerFraADGrupper) {
+                    logger.info("Enhettilganger er identiske mellom unikeEnhetTilgangerFraADGrupper og adGrupperForNavIdent(common-java-modules).")
+                } else {
+                    logger.warn("Enhettilganger er ikke identiske mellom unikeEnhetTilgangerFraADGrupper og adGrupperForNavIdent(common-java-modules).")
+                }
 
                 if (unikeEnhetTilgangerFraAxsys == unikeEnhetTilgangerFraADGrupper) {
                     logger.info("Enhettilganger er identiske mellom Axsys og AD-grupper.")
@@ -94,6 +108,11 @@ class EnhetService(
     fun hentEnheterFraAxsys(navIdent: NavIdent): List<PortefoljeEnhet> {
         return axsysClient.hentTilganger(navIdent)
             .map { axsysEnhet: AxsysEnhet? -> Mappers.tilPortefoljeEnhet(axsysEnhet) }
+    }
+    fun hentTilgangerFraEntraId(navIdent: NavIdent): Set<EnhetId> {
+
+        return msGraphClient.hentAdGroupsForUser(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope),navIdent.toString(), AdGroupFilter.ENHET)
+            .map { tilEnhetId(it.displayName) }.toSet()
     }
 
     fun hentEnhetTilgangerFraADGrupper(): Set<EnhetId> {

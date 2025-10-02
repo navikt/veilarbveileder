@@ -23,7 +23,10 @@ import org.mockito.ArgumentMatchers.eq
 
 import no.nav.common.client.norg2.Enhet
 import no.nav.common.client.axsys.AxsysEnhet
+import no.nav.common.client.msgraph.AdGroupData
+import no.nav.common.client.msgraph.AdGroupFilter
 import no.nav.common.client.msgraph.UserData
+import no.nav.common.types.identer.AzureObjectId
 import no.nav.veilarbveileder.client.AdGruppe
 import org.mockito.Mockito.*
 
@@ -161,6 +164,34 @@ class EnhetServiceTest {
         assertEquals(1, result.size)
         assertEquals(EnhetId.of("1234"), result[0]?.enhetId)
         verify(microsoftGraphClient).hentAdGrupper()
+    }
+
+    @Test
+    fun `hentTilgangerFraEntraId returns mapped EnhetIds from AD groups`() {
+        // Given
+        val navIdent = NavIdent.of("A123456")
+        val token = "test-token"
+        val adGroupData1 = AdGroupData(AzureObjectId.of("id1"), "0000-GA-ENHET_1234")
+        val adGroupData2 = AdGroupData(AzureObjectId.of("id2"), "0000-GA-ENHET_5678")
+
+        `when`(azureAdMachineToMachineTokenClient.createMachineToMachineToken(any())).thenReturn(token)
+        `when`(environmentProperties.microsoftGraphScope).thenReturn("https://graph.microsoft.com/.default")
+        `when`(
+            msGraphClient.hentAdGroupsForUser(
+                eq(token),
+                eq("A123456"),
+                eq(AdGroupFilter.ENHET)
+            )
+        ).thenReturn(listOf(adGroupData1, adGroupData2))
+
+        // When
+        val result = enhetService.hentTilgangerFraEntraId(navIdent)
+
+        // Then
+        assertEquals(2, result.size)
+        assertTrue(result.contains(EnhetId.of("1234")))
+        assertTrue(result.contains(EnhetId.of("5678")))
+        verify(msGraphClient).hentAdGroupsForUser(token, "A123456", AdGroupFilter.ENHET)
     }
 
     @Test
