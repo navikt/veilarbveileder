@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.ws.rs.core.HttpHeaders
 import no.nav.common.auth.context.AuthContextHolder
-import no.nav.common.json.JsonUtils
 import no.nav.common.rest.client.RestClient
 import no.nav.common.rest.client.RestUtils
 import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient
