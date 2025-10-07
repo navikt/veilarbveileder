@@ -70,15 +70,22 @@ class EnhetService(
             // (vha. AD-grupper) måte å hente enhetstilganger på. Axsys er fortsatt "fasit".
             try {
                 val enhetTilgangerFraAxsys = hentEnheterFraAxsys(navIdent)
-                val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper()
+                val enhetInfoListe = norg2Client.alleAktiveEnheter()
+                val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper().map { enhetId ->
+                    PortefoljeEnhet(
+                        enhetId = enhetId,
+                        navn = enhetInfoListe.first { enhetId.get() == it.enhetNr }.navn
+                    )
+                }.toSet()
                 val unikeEnhetTilgangerFraAxsys =
-                    enhetTilgangerFraAxsys.map(PortefoljeEnhet::enhetId).toSet()
+                    enhetTilgangerFraAxsys.toSet()
 
                 if (unikeEnhetTilgangerFraAxsys == unikeEnhetTilgangerFraADGrupper) {
                     logger.info("Enhettilganger er identiske mellom Axsys og AD-grupper.")
                 } else {
                     logger.warn("Enhettilganger er ikke identiske mellom Axsys og AD-grupper.")
                 }
+
                 enhetTilgangerFraAxsys
             } catch (_: NavEnhetIdValideringException) {
                 throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR)
