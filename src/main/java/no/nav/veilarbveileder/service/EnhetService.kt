@@ -3,12 +3,15 @@ package no.nav.veilarbveileder.service
 import io.getunleash.DefaultUnleash
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
+import no.nav.common.auth.context.AuthContextHolder
 import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.axsys.AxsysEnhet
+import no.nav.common.client.msgraph.AdGroupFilter
 import no.nav.common.client.msgraph.MsGraphClient
 import no.nav.common.client.norg2.Enhet
 import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
+import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient
 import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
 import no.nav.veilarbveileder.client.MicrosoftGraphClient
@@ -32,6 +35,9 @@ class EnhetService(
     private val microsoftGraphClient: MicrosoftGraphClient,
     private val msGraphClient: MsGraphClient,
     private val azureAdMachineToMachineTokenClient: AzureAdMachineToMachineTokenClient,
+    private val azureAdOnBehalfOfTokenClient: AzureAdOnBehalfOfTokenClient,
+    private val authContextHolder: AuthContextHolder,
+    private val authService: AuthService,
     private val environmentProperties: EnvironmentProperties,
     private val defaultUnleash: DefaultUnleash
 ) {
@@ -97,7 +103,14 @@ class EnhetService(
     }
 
     fun hentEnhetTilgangerFraADGrupper(): Set<EnhetId> {
-        return microsoftGraphClient.hentAdGrupper()
+        return msGraphClient.hentAdGroupsForUser(
+            azureAdOnBehalfOfTokenClient.exchangeOnBehalfOfToken(
+                environmentProperties.microsoftGraphScope,
+                authContextHolder.requireIdTokenString()
+            ),
+            authService.innloggetVeilederIdent.get(),
+            AdGroupFilter.ENHET
+        )
             .map { tilEnhetId(it.displayName) }
             .toSet()
     }
