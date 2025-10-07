@@ -70,11 +70,11 @@ class EnhetService(
             // (vha. AD-grupper) måte å hente enhetstilganger på. Axsys er fortsatt "fasit".
             try {
                 val enhetTilgangerFraAxsys = hentEnheterFraAxsys(navIdent)
-                val enhetInfoListe = norg2Client.alleAktiveEnheter()
+                val aktiveEnheter = norg2Client.alleAktiveEnheter()
                 val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper().map { enhetId ->
                     PortefoljeEnhet(
                         enhetId = enhetId,
-                        navn = enhetInfoListe.first { enhetId.get() == it.enhetNr }.navn
+                        navn = aktiveEnheter.first { enhetId.get() == it.enhetNr }.navn
                     )
                 }.toSet()
                 val unikeEnhetTilgangerFraAxsys =
