@@ -18,7 +18,9 @@ import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
 import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import no.nav.veilarbveileder.utils.Mappers
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Service
@@ -58,17 +60,16 @@ class EnhetService(
             ).map { NavIdent.of(it.onPremisesSamAccountName) }
 
         } else {
-          axsysClient.hentAnsatte(enhetId)
+            axsysClient.hentAnsatte(enhetId)
         }
     }
 
     fun hentTilganger(navIdent: NavIdent): List<PortefoljeEnhet?> {
         return if (defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)) {
-            val enhetTilgangerFraAxsys = hentEnheterFraAxsys(navIdent)
-
             // 2025-08-15: Her sammenlignes og logges bare eventuell differanse mellom gammel (Axsys) og ny
             // (vha. AD-grupper) måte å hente enhetstilganger på. Axsys er fortsatt "fasit".
             try {
+                val enhetTilgangerFraAxsys = hentEnheterFraAxsys(navIdent)
                 val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper()
                 val unikeEnhetTilgangerFraAxsys =
                     enhetTilgangerFraAxsys.map(PortefoljeEnhet::enhetId).toSet()
@@ -78,14 +79,10 @@ class EnhetService(
                 } else {
                     logger.warn("Enhettilganger er ikke identiske mellom Axsys og AD-grupper.")
                 }
-            } catch (e: NavEnhetIdValideringException) {
-                logger.warn(
-                    "Kunne ikke hente enhettilganger fra AD-grupper. Årsak: validering feilet for en eller flere utlede NavEnhetId-er.",
-                    e
-                )
+                enhetTilgangerFraAxsys
+            } catch (_: NavEnhetIdValideringException) {
+                throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR)
             }
-
-            enhetTilgangerFraAxsys
         } else {
             hentEnheterFraAxsys(navIdent)
         }
@@ -116,7 +113,7 @@ class EnhetService(
         private fun tilValidertEnhetId(navEnhetId: String): EnhetId {
             if (navEnhetId.length != NAV_ENHET_ID_LENGDE) throw NavEnhetIdValideringException("Ugyldig lengde: ${navEnhetId.length}. Forventet: $NAV_ENHET_ID_LENGDE.")
             if (
-               !navEnhetId.all { it.isDigit() }
+                !navEnhetId.all { it.isDigit() }
             ) throw NavEnhetIdValideringException("Ugyldige tegn: ${navEnhetId}. Forventet: 4 siffer.")
 
             return EnhetId.of(navEnhetId)

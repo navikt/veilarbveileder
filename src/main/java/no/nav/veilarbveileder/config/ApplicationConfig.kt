@@ -16,6 +16,7 @@ import no.nav.common.client.msgraph.MsGraphHttpClient
 import no.nav.common.client.nom.CachedNomClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.nom.NomClientImpl
+import no.nav.common.client.norg2.CachedNorg2Client
 import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.client.norg2.NorgHttp2Client
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
@@ -61,7 +62,7 @@ class ApplicationConfig {
 
     @Bean
     fun norg2Client(properties: EnvironmentProperties): Norg2Client {
-        return (NorgHttp2Client(properties.norg2Url))
+        return NorgHttp2Client(properties.norg2Url)
     }
 
     @Bean
