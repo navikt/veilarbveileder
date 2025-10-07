@@ -66,8 +66,6 @@ class EnhetService(
 
     fun hentTilganger(navIdent: NavIdent): List<PortefoljeEnhet?> {
         return if (defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)) {
-            // 2025-08-15: Her sammenlignes og logges bare eventuell differanse mellom gammel (Axsys) og ny
-            // (vha. AD-grupper) måte å hente enhetstilganger på. Axsys er fortsatt "fasit".
             try {
                 val enhetTilgangerFraAxsys = hentEnheterFraAxsys(navIdent)
                 val aktiveEnheter = norg2Client.alleAktiveEnheter()
@@ -86,7 +84,7 @@ class EnhetService(
                     logger.warn("Enhettilganger er ikke identiske mellom Axsys og AD-grupper.")
                 }
 
-                enhetTilgangerFraAxsys
+                unikeEnhetTilgangerFraADGrupper.toList()
             } catch (_: NavEnhetIdValideringException) {
                 throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR)
             }
