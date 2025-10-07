@@ -67,16 +67,14 @@ class EnhetService(
     fun hentTilganger(navIdent: NavIdent): List<PortefoljeEnhet?> {
         return if (defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)) {
             try {
-                val enhetTilgangerFraAxsys = hentEnheterFraAxsys(navIdent)
                 val aktiveEnheter = norg2Client.alleAktiveEnheter()
+                val unikeEnhetTilgangerFraAxsys = hentEnheterFraAxsys(navIdent).toSet()
                 val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper().map { enhetId ->
                     PortefoljeEnhet(
                         enhetId = enhetId,
                         navn = aktiveEnheter.first { enhetId.get() == it.enhetNr }.navn
                     )
                 }.toSet()
-                val unikeEnhetTilgangerFraAxsys =
-                    enhetTilgangerFraAxsys.toSet()
 
                 if (unikeEnhetTilgangerFraAxsys == unikeEnhetTilgangerFraADGrupper) {
                     logger.info("Enhettilganger er identiske mellom Axsys og AD-grupper.")
