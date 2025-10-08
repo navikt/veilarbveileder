@@ -35,7 +35,6 @@ class EnhetService(
     private val azureAdMachineToMachineTokenClient: AzureAdMachineToMachineTokenClient,
     private val azureAdOnBehalfOfTokenClient: AzureAdOnBehalfOfTokenClient,
     private val authContextHolder: AuthContextHolder,
-    private val authService: AuthService,
     private val environmentProperties: EnvironmentProperties,
     private val defaultUnleash: DefaultUnleash
 ) {
@@ -106,7 +105,6 @@ class EnhetService(
                 environmentProperties.microsoftGraphScope,
                 authContextHolder.requireIdTokenString()
             ),
-            authService.innloggetVeilederIdent.get(),
             AdGroupFilter.ENHET
         )
             .map { tilEnhetId(it.displayName) }

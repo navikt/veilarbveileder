@@ -50,9 +50,6 @@ class EnhetServiceTest {
     private lateinit var azureAdOnBehalfOfTokenClient: AzureAdOnBehalfOfTokenClient
 
     @Mock(strictness = Mock.Strictness.LENIENT)
-    private lateinit var authService: AuthService
-
-    @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var authContextHolder: AuthContextHolder
 
     @Mock(strictness = Mock.Strictness.LENIENT)
@@ -76,8 +73,9 @@ class EnhetServiceTest {
         `when`(defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)).thenReturn(true)
         `when`(azureAdMachineToMachineTokenClient.createMachineToMachineToken(any())).thenReturn(TEST_M2M_TOKEN)
         `when`(authContextHolder.requireIdTokenString()).thenReturn(TEST_OBO_TOKEN)
-        `when`(azureAdOnBehalfOfTokenClient.exchangeOnBehalfOfToken(any(), eq(TEST_OBO_TOKEN))).thenReturn(TEST_SCOPED_OBO_TOKEN)
-        `when`(authService.innloggetVeilederIdent).thenReturn(NavIdent.of(TEST_NAV_IDENT))
+        `when`(azureAdOnBehalfOfTokenClient.exchangeOnBehalfOfToken(any(), eq(TEST_OBO_TOKEN))).thenReturn(
+            TEST_SCOPED_OBO_TOKEN
+        )
 
         enhetService = EnhetService(
             norg2Client,
@@ -86,7 +84,6 @@ class EnhetServiceTest {
             azureAdMachineToMachineTokenClient,
             azureAdOnBehalfOfTokenClient,
             authContextHolder,
-            authService,
             environmentProperties,
             defaultUnleash
         )
@@ -139,7 +136,12 @@ class EnhetServiceTest {
         val userData1 = UserData().apply { onPremisesSamAccountName = "A123456" }
         val userData2 = UserData().apply { onPremisesSamAccountName = "B789012" }
 
-        `when`(msGraphClient.hentUserDataForGroup(eq(TEST_M2M_TOKEN), eq(enhetId))).thenReturn(listOf(userData1, userData2))
+        `when`(msGraphClient.hentUserDataForGroup(eq(TEST_M2M_TOKEN), eq(enhetId))).thenReturn(
+            listOf(
+                userData1,
+                userData2
+            )
+        )
 
         val result = enhetService.veilederePaEnhet(enhetId)
 
@@ -157,7 +159,6 @@ class EnhetServiceTest {
         `when`(
             msGraphClient.hentAdGroupsForUser(
                 TEST_SCOPED_OBO_TOKEN,
-                TEST_NAV_IDENT,
                 AdGroupFilter.ENHET
             )
         ).thenReturn(listOf(adGroup))
