@@ -78,7 +78,7 @@ class EnhetService(
                 val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper().map { enhetId ->
                     PortefoljeEnhet(
                         enhetId = enhetId,
-                        navn = aktiveEnheter.first { enhetId.get() == it.enhetNr }.navn
+                        navn = aktiveEnheter.firstOrNull { enhetId.get() == it.enhetNr }?.navn
                     )
                 }.toSet()
 
