@@ -20,7 +20,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>3.2025.10.07_09.28-dcaa42fbab79-beta</common.version>
+        <common.version>3.2025.10.08_13.42-19b36141a1b0-beta</common.version>
         <kotlin.version>2.2.20</kotlin.version>
         <unleash.version>10.2.2</unleash.version>
     </properties>
