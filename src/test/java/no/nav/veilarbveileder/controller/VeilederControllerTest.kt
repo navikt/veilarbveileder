@@ -3,11 +3,11 @@ package no.nav.veilarbveileder.controller
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import io.getunleash.DefaultUnleash
+import no.nav.common.auth.context.AuthContextHolder
 import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.json.JsonUtils
-import no.nav.veilarbveileder.client.MicrosoftGraphClient
 import no.nav.veilarbveileder.config.ApplicationTestConfig
 import no.nav.veilarbveileder.config.EnvironmentConfig
 import no.nav.veilarbveileder.domain.Veileder
@@ -21,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -45,21 +46,6 @@ class VeilederControllerTest {
 
     @Autowired
     lateinit var mockMvc: MockMvc
-
-    @MockBean
-    lateinit var authService: AuthService
-
-    @MockBean
-    lateinit var norg2Client: Norg2Client
-
-    @MockBean
-    lateinit var axsysClient: AxsysClient
-
-    @MockBean
-    lateinit var microsoftGraphClient: MicrosoftGraphClient
-
-    @MockBean
-    lateinit var defaultUnleash: DefaultUnleash
 
     @Autowired
     lateinit var nomClient: NomClient

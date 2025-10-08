@@ -1,78 +1,101 @@
 package no.nav.veilarbveileder.service
 
+import io.getunleash.DefaultUnleash
+import no.nav.common.auth.context.AuthContextHolder
+import no.nav.common.client.axsys.AxsysClient
+import no.nav.common.client.axsys.AxsysEnhet
+import no.nav.common.client.msgraph.AdGroupData
+import no.nav.common.client.msgraph.AdGroupFilter
+import no.nav.common.client.msgraph.MsGraphClient
+import no.nav.common.client.msgraph.UserData
+import no.nav.common.client.norg2.Enhet
+import no.nav.common.client.norg2.Norg2Client
+import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
+import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient
+import no.nav.common.types.identer.AzureObjectId
+import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
+import no.nav.veilarbveileder.config.EnvironmentProperties
+import no.nav.veilarbveileder.service.EnhetService.Companion.AD_GRUPPE_ENHET_PREFIKS
+import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
+import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
-import no.nav.common.client.axsys.AxsysClient
-import no.nav.common.client.norg2.Norg2Client
-import no.nav.common.client.msgraph.MsGraphClient
-import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
-import io.getunleash.DefaultUnleash
-import no.nav.common.types.identer.EnhetId
-import no.nav.veilarbveileder.client.MicrosoftGraphClient
-import no.nav.veilarbveileder.config.EnvironmentProperties
-import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
-import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
-
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
-
-import no.nav.common.client.norg2.Enhet
-import no.nav.common.client.axsys.AxsysEnhet
-import no.nav.common.client.msgraph.UserData
-import no.nav.veilarbveileder.client.AdGruppe
-import org.mockito.Mockito.*
+import org.mockito.Mock
+import org.mockito.Mockito.`when`
+import org.mockito.junit.jupiter.MockitoExtension
+import java.util.*
 
 
 @ExtendWith(MockitoExtension::class)
 class EnhetServiceTest {
 
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var norg2Client: Norg2Client
 
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var axsysClient: AxsysClient
 
-    @Mock
-    private lateinit var microsoftGraphClient: MicrosoftGraphClient
-
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var msGraphClient: MsGraphClient
 
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var azureAdMachineToMachineTokenClient: AzureAdMachineToMachineTokenClient
 
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
+    private lateinit var azureAdOnBehalfOfTokenClient: AzureAdOnBehalfOfTokenClient
+
+    @Mock(strictness = Mock.Strictness.LENIENT)
+    private lateinit var authService: AuthService
+
+    @Mock(strictness = Mock.Strictness.LENIENT)
+    private lateinit var authContextHolder: AuthContextHolder
+
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var environmentProperties: EnvironmentProperties
 
-    @Mock
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var defaultUnleash: DefaultUnleash
 
     private lateinit var enhetService: EnhetService
 
+    companion object {
+        const val TEST_M2M_TOKEN = "m2m-token"
+        const val TEST_OBO_TOKEN = "obo-token"
+        const val TEST_SCOPED_OBO_TOKEN = "scoped-obo-token"
+        const val TEST_NAV_IDENT = "Z998877"
+    }
+
     @BeforeEach
     fun setup() {
+        `when`(defaultUnleash.isEnabled(BRUK_VEILEDERE_PAA_ENHET_FRA_AD)).thenReturn(true)
+        `when`(defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)).thenReturn(true)
+        `when`(azureAdMachineToMachineTokenClient.createMachineToMachineToken(any())).thenReturn(TEST_M2M_TOKEN)
+        `when`(authContextHolder.requireIdTokenString()).thenReturn(TEST_OBO_TOKEN)
+        `when`(azureAdOnBehalfOfTokenClient.exchangeOnBehalfOfToken(any(), eq(TEST_OBO_TOKEN))).thenReturn(TEST_SCOPED_OBO_TOKEN)
+        `when`(authService.innloggetVeilederIdent).thenReturn(NavIdent.of(TEST_NAV_IDENT))
+
         enhetService = EnhetService(
             norg2Client,
             axsysClient,
-            microsoftGraphClient,
             msGraphClient,
             azureAdMachineToMachineTokenClient,
+            azureAdOnBehalfOfTokenClient,
+            authContextHolder,
+            authService,
             environmentProperties,
             defaultUnleash
         )
     }
 
     @Test
-    fun `hentEnhet returns optional with enhet when norg2 returns unit`() {
+    fun `hentEnhet returnerer forventet enhet`() {
         val enhetId = EnhetId.of("1234")
-        val enhet = mock(Enhet::class.java)
-        `when`(enhet.enhetNr).thenReturn("1234")
-        `when`(enhet.navn).thenReturn("NAV Test")
+        val enhet = Enhet().setEnhetNr("1234").setNavn("NAV Test")
 
         `when`(norg2Client.hentEnhet("1234")).thenReturn(enhet)
 
@@ -84,7 +107,7 @@ class EnhetServiceTest {
     }
 
     @Test
-    fun `hentEnhet returns empty optional when norg2 throws exception`() {
+    fun `hentEnhet returnerer tom optional`() {
         val enhetId = EnhetId.of("1234")
 
         `when`(norg2Client.hentEnhet("1234")).thenThrow(RuntimeException("Not found"))
@@ -95,33 +118,28 @@ class EnhetServiceTest {
     }
 
     @Test
-    fun `alleEnheter returns mapped portefoljeEnheter`() {
-        val enhet1 = mock(Enhet::class.java)
-        val enhet2 = mock(Enhet::class.java)
+    fun `alleEnheter returnerer forventede porteføljeenheter`() {
+        val enhet1 = Enhet().setEnhetNr("1234").setNavn("Nav-kontor 1")
+        val enhet2 = Enhet().setEnhetNr("5678").setNavn("Nav-kontor 2")
 
-        `when`(enhet1.enhetNr).thenReturn("1234")
-        `when`(enhet1.navn).thenReturn("Nav-kontor 1")
-        `when`(enhet2.enhetNr).thenReturn("5678")
-        `when`(enhet2.navn).thenReturn("Nav-kontor 2")
         `when`(norg2Client.alleAktiveEnheter()).thenReturn(listOf(enhet1, enhet2))
 
         val result = enhetService.alleEnheter()
 
         assertEquals(2, result.size)
         assertEquals(EnhetId.of("1234"), result[0]?.enhetId)
+        assertEquals("Nav-kontor 1", result[0]?.navn)
         assertEquals(EnhetId.of("5678"), result[1]?.enhetId)
+        assertEquals("Nav-kontor 2", result[1]?.navn)
     }
 
     @Test
-    fun `veilederePaEnhet gets users from MS Graph when feature flag is enabled`() {
+    fun `veilederePaEnhet returnerer forventede veiledere på enhet`() {
         val enhetId = EnhetId.of("1234")
         val userData1 = UserData().apply { onPremisesSamAccountName = "A123456" }
         val userData2 = UserData().apply { onPremisesSamAccountName = "B789012" }
-        val token = "token123"
 
-        `when`(defaultUnleash.isEnabled(BRUK_VEILEDERE_PAA_ENHET_FRA_AD)).thenReturn(true)
-        `when`(azureAdMachineToMachineTokenClient.createMachineToMachineToken(any())).thenReturn(token)
-        `when`(msGraphClient.hentUserDataForGroup(eq(token), eq(enhetId))).thenReturn(listOf(userData1, userData2))
+        `when`(msGraphClient.hentUserDataForGroup(eq(TEST_M2M_TOKEN), eq(enhetId))).thenReturn(listOf(userData1, userData2))
 
         val result = enhetService.veilederePaEnhet(enhetId)
 
@@ -131,52 +149,39 @@ class EnhetServiceTest {
     }
 
     @Test
-    fun `veilederePaEnhet gets users from Axsys when feature flag is disabled`() {
-        val enhetId = EnhetId.of("1234")
-        val navIdents = listOf(NavIdent.of("A123456"), NavIdent.of("B789012"))
+    fun `hentTilganger returnerer forventede tilganger for veileder`() {
+        val adGroup = AdGroupData(AzureObjectId.of(UUID.randomUUID().toString()), "${AD_GRUPPE_ENHET_PREFIKS}1234")
+        val axsysEnhet = AxsysEnhet().setEnhetId(EnhetId.of("1234")).setNavn("Nav Oslo")
 
-        `when`(defaultUnleash.isEnabled(BRUK_VEILEDERE_PAA_ENHET_FRA_AD)).thenReturn(false)
-        `when`(axsysClient.hentAnsatte(enhetId)).thenReturn(navIdents)
+        `when`(axsysClient.hentTilganger(NavIdent.of(TEST_NAV_IDENT))).thenReturn(listOf(axsysEnhet))
+        `when`(
+            msGraphClient.hentAdGroupsForUser(
+                TEST_SCOPED_OBO_TOKEN,
+                TEST_NAV_IDENT,
+                AdGroupFilter.ENHET
+            )
+        ).thenReturn(listOf(adGroup))
 
-        val result = enhetService.veilederePaEnhet(enhetId)
-
-        assertEquals(navIdents, result)
-    }
-
-    @Test
-    fun `hentTilganger compares results when feature flag is enabled`() {
-        val navIdent = NavIdent.of("A123456")
-        val axsysEnhet = mock(AxsysEnhet::class.java)
-        `when`(axsysEnhet.enhetId).thenReturn(EnhetId.of("1234"))
-        `when`(axsysEnhet.navn).thenReturn("Group 1234")
-
-        val adGroup = AdGruppe("0000-GA-ENHET_1234", "Nav-kontoret")
-
-        `when`(defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)).thenReturn(true)
-        `when`(axsysClient.hentTilganger(navIdent)).thenReturn(listOf(axsysEnhet))
-        `when`(microsoftGraphClient.hentAdGrupper()).thenReturn(setOf(adGroup))
-
-        val result = enhetService.hentTilganger(navIdent)
+        val result = enhetService.hentTilganger(NavIdent.of(TEST_NAV_IDENT))
 
         assertEquals(1, result.size)
         assertEquals(EnhetId.of("1234"), result[0]?.enhetId)
-        verify(microsoftGraphClient).hentAdGrupper()
     }
 
     @Test
-    fun `tilEnhetId extracts correct EnhetId from AD group name`() {
+    fun `tilEnhetId henter ut EnhetId fra AD-gruppe navn`() {
         val result = EnhetService.tilEnhetId("0000-GA-ENHET_1234")
         assertEquals("1234", result.get())
     }
 
     @Test
-    fun `tilEnhetId handles lowercase input correctly`() {
+    fun `tilEnhetId hådnterer lowercase input korrekt`() {
         val result = EnhetService.tilEnhetId("0000-ga-enhet_1234")
         assertEquals("1234", result.get())
     }
 
     @Test
-    fun `tilValidertEnhetId throws exception for invalid length`() {
+    fun `tilValidertEnhetId kaster exception dersom ugyldig lengde på enhet-ID`() {
         val exception = assertThrows(EnhetService.NavEnhetIdValideringException::class.java) {
             EnhetService.tilEnhetId("0000-GA-ENHET_123")
         }
@@ -185,7 +190,7 @@ class EnhetServiceTest {
     }
 
     @Test
-    fun `tilValidertEnhetId throws exception for non-numeric input`() {
+    fun `tilValidertEnhetId kaster exception for ikke-numerisk enhet-ID`() {
         val exception = assertThrows(EnhetService.NavEnhetIdValideringException::class.java) {
             EnhetService.tilEnhetId("0000-GA-ENHET_123A")
         }

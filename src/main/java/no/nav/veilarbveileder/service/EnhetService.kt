@@ -14,7 +14,6 @@ import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
 import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient
 import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
-import no.nav.veilarbveileder.client.MicrosoftGraphClient
 import no.nav.veilarbveileder.config.EnvironmentProperties
 import no.nav.veilarbveileder.domain.PortefoljeEnhet
 import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
@@ -32,7 +31,6 @@ import java.util.*
 class EnhetService(
     private val norg2Client: Norg2Client,
     private val axsysClient: AxsysClient,
-    private val microsoftGraphClient: MicrosoftGraphClient,
     private val msGraphClient: MsGraphClient,
     private val azureAdMachineToMachineTokenClient: AzureAdMachineToMachineTokenClient,
     private val azureAdOnBehalfOfTokenClient: AzureAdOnBehalfOfTokenClient,
@@ -116,8 +114,8 @@ class EnhetService(
     }
 
     companion object {
-        private const val AD_GRUPPE_ENHET_PREFIKS = "0000-GA-ENHET_"
-        private const val NAV_ENHET_ID_LENGDE = 4
+        internal const val AD_GRUPPE_ENHET_PREFIKS = "0000-GA-ENHET_"
+        internal const val NAV_ENHET_ID_LENGDE = 4
 
         fun tilEnhetId(adGruppeNavn: String): EnhetId {
             return adGruppeNavn

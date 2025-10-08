@@ -2,8 +2,6 @@ package no.nav.veilarbveileder.controller;
 
 import jakarta.ws.rs.Produces;
 import no.nav.common.types.identer.NavIdent;
-import no.nav.veilarbveileder.client.AdGruppe;
-import no.nav.veilarbveileder.client.MicrosoftGraphClient;
 import no.nav.veilarbveileder.controller.dto.ListVeiledereRequest;
 import no.nav.veilarbveileder.domain.IdentOgEnhetliste;
 import no.nav.veilarbveileder.domain.PortefoljeEnhet;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/veileder")
@@ -27,17 +24,14 @@ public class VeilederController {
 
     private final VeilederOgEnhetServiceV2 veilederOgEnhetService;
     private final AuthService authService;
-    private final MicrosoftGraphClient microsoftGraphClient;
 
     @Autowired
     public VeilederController(
             VeilederOgEnhetServiceV2 veilederOgEnhetService,
-            AuthService authService,
-            MicrosoftGraphClient microsoftGraphClient
+            AuthService authService
     ) {
         this.veilederOgEnhetService = veilederOgEnhetService;
         this.authService = authService;
-        this.microsoftGraphClient = microsoftGraphClient;
     }
 
     @GetMapping("/enheter")
