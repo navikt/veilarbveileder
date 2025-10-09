@@ -16,7 +16,6 @@ import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
 import no.nav.veilarbveileder.config.EnvironmentProperties
 import no.nav.veilarbveileder.domain.PortefoljeEnhet
-import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
 import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import no.nav.veilarbveileder.utils.Mappers
 import no.nav.veilarbveileder.utils.SecureLog
@@ -57,15 +56,10 @@ class EnhetService(
     }
 
     fun veilederePaEnhet(enhetId: EnhetId?): List<NavIdent?>? {
-        return if (defaultUnleash.isEnabled(BRUK_VEILEDERE_PAA_ENHET_FRA_AD)) {
-            msGraphClient.hentUserDataForGroup(
-                azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope),
-                enhetId
-            ).map { NavIdent.of(it.onPremisesSamAccountName) }
-
-        } else {
-            axsysClient.hentAnsatte(enhetId)
-        }
+        return msGraphClient.hentUserDataForGroup(
+            azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.microsoftGraphScope),
+            enhetId
+        ).map { NavIdent.of(it.onPremisesSamAccountName) }
     }
 
     fun hentTilganger(navIdent: NavIdent): List<PortefoljeEnhet?> {
