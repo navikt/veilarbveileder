@@ -81,18 +81,4 @@ public class EnhetController {
 
         return veilederOgEnhetService.hentIdentListe(enhetId);
     }
-
-    @GetMapping("/{groupId}/azure-user-data")
-    public List<UserData> hentAnsatteByGroupId(@PathVariable("groupId") UUID groupId) {
-        authService.sjekkTilgangTilModia();
-
-        return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), groupId.toString());
-    }
-    @GetMapping("/{enhetId}/azure-user-data2")
-    public List<UserData> hentAnsatteByEnhetId(@PathVariable("enhetId") EnhetId enhetId) {
-        authService.sjekkTilgangTilModia();
-
-        return msGraphClient.hentUserDataForGroup(azureAdMachineToMachineTokenClient.createMachineToMachineToken(environmentProperties.getMicrosoftGraphScope()), enhetId);
-    }
-
 }
