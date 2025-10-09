@@ -19,6 +19,7 @@ import no.nav.veilarbveileder.domain.PortefoljeEnhet
 import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
 import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import no.nav.veilarbveileder.utils.Mappers
+import no.nav.veilarbveileder.utils.SecureLog
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -82,7 +83,17 @@ class EnhetService(
                 if (unikeEnhetTilgangerFraAxsys == unikeEnhetTilgangerFraADGrupper) {
                     logger.info("Enhettilganger er identiske mellom Axsys og AD-grupper.")
                 } else {
-                    logger.warn("Enhettilganger er ikke identiske mellom Axsys og AD-grupper.")
+                    val antallEnhetstilgangerAxsys = unikeEnhetTilgangerFraAxsys.size
+                    val antallEnhetstilgangerADGrupper = unikeEnhetTilgangerFraADGrupper.size
+                    logger.warn(
+                        "Enhettilganger er ikke identiske mellom Axsys og AD-grupper. Antall enhetstilganger fra Axsys: {}, antall enhetstilganger fra AD-grupper: {}.",
+                        antallEnhetstilgangerAxsys,
+                        antallEnhetstilgangerADGrupper
+                    )
+                    SecureLog.secureLog.warn(
+                        "Enhettilganger for ident {} er ikke identiske mellom Axsys og AD-grupper. ",
+                        navIdent
+                    )
                 }
 
                 unikeEnhetTilgangerFraADGrupper.toList()
