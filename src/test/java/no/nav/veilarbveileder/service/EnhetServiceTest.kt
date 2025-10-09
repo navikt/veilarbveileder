@@ -17,7 +17,6 @@ import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
 import no.nav.veilarbveileder.config.EnvironmentProperties
 import no.nav.veilarbveileder.service.EnhetService.Companion.AD_GRUPPE_ENHET_PREFIKS
-import no.nav.veilarbveileder.utils.BRUK_VEILEDERE_PAA_ENHET_FRA_AD
 import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -69,7 +68,6 @@ class EnhetServiceTest {
 
     @BeforeEach
     fun setup() {
-        `when`(defaultUnleash.isEnabled(BRUK_VEILEDERE_PAA_ENHET_FRA_AD)).thenReturn(true)
         `when`(defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)).thenReturn(true)
         `when`(azureAdMachineToMachineTokenClient.createMachineToMachineToken(any())).thenReturn(TEST_M2M_TOKEN)
         `when`(authContextHolder.requireIdTokenString()).thenReturn(TEST_OBO_TOKEN)
