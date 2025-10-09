@@ -16,7 +16,6 @@ import no.nav.common.client.msgraph.MsGraphHttpClient
 import no.nav.common.client.nom.CachedNomClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.nom.NomClientImpl
-import no.nav.common.client.norg2.CachedNorg2Client
 import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.client.norg2.NorgHttp2Client
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
@@ -35,7 +34,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
-
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
