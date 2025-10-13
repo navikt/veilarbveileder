@@ -10,10 +10,8 @@ import no.nav.veilarbveileder.domain.VeilederInfo;
 import no.nav.veilarbveileder.service.AuthService;
 import no.nav.veilarbveileder.service.VeilederOgEnhetServiceV2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -40,16 +38,6 @@ public class VeilederController {
         NavIdent navIdent = authService.getInnloggetVeilederIdent();
         List<PortefoljeEnhet> response = veilederOgEnhetService.hentEnhetListe(navIdent);
         return new IdentOgEnhetliste(navIdent, response);
-    }
-
-    @GetMapping("/enheter/{veilederIdent}")
-    public IdentOgEnhetliste hentEnheter(@PathVariable("veilederIdent") NavIdent veilederIdent) {
-        if (!authService.erSystemBrukerFraAzureAd()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til oppfølging");
-        }
-
-        List<PortefoljeEnhet> response = veilederOgEnhetService.hentEnhetListe(veilederIdent);
-        return new IdentOgEnhetliste(veilederIdent, response);
     }
 
     @GetMapping("/me")
