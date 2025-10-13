@@ -2,16 +2,11 @@ package no.nav.veilarbveileder.controller
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import io.getunleash.DefaultUnleash
-import no.nav.common.auth.context.AuthContextHolder
-import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.nom.NomClient
-import no.nav.common.client.norg2.Norg2Client
 import no.nav.common.json.JsonUtils
 import no.nav.veilarbveileder.config.ApplicationTestConfig
 import no.nav.veilarbveileder.config.EnvironmentConfig
 import no.nav.veilarbveileder.domain.Veileder
-import no.nav.veilarbveileder.service.AuthService
 import no.nav.veilarbveileder.service.EnhetService
 import no.nav.veilarbveileder.service.VeilederOgEnhetServiceV2
 import no.nav.veilarbveileder.service.VeilederService
@@ -19,9 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post

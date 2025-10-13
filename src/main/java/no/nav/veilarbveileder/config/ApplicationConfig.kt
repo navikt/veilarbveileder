@@ -1,15 +1,10 @@
 package no.nav.veilarbveileder.config
 
-import com.github.benmanes.caffeine.cache.Caffeine
 import io.getunleash.DefaultUnleash
 import io.getunleash.util.UnleashConfig
 import lombok.extern.slf4j.Slf4j
 import no.nav.common.auth.context.AuthContextHolder
 import no.nav.common.auth.context.AuthContextHolderThreadLocal
-import no.nav.common.client.axsys.AxsysClient
-import no.nav.common.client.axsys.AxsysClientImpl
-import no.nav.common.client.axsys.AxsysEnhet
-import no.nav.common.client.axsys.CachedAxsysClient
 import no.nav.common.client.msgraph.CachedMsGraphClient
 import no.nav.common.client.msgraph.MsGraphClient
 import no.nav.common.client.msgraph.MsGraphHttpClient
@@ -21,8 +16,6 @@ import no.nav.common.client.norg2.NorgHttp2Client
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient
 import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient
-import no.nav.common.types.identer.EnhetId
-import no.nav.common.types.identer.NavIdent
 import no.nav.common.utils.EnvironmentUtils
 import no.nav.common.utils.EnvironmentUtils.isProduction
 import no.nav.poao_tilgang.client.PoaoTilgangCachedClient
@@ -34,7 +27,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
-import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
 
@@ -51,6 +43,7 @@ class ApplicationConfig {
             .withNaisDefaults()
             .buildMachineToMachineTokenClient()
     }
+
     @Bean
     fun azureAdOnBehalfOfTokenClient(): AzureAdOnBehalfOfTokenClient {
         return AzureAdTokenClientBuilder.builder()
@@ -64,28 +57,16 @@ class ApplicationConfig {
     }
 
     @Bean
-    fun axsysClient(properties: EnvironmentProperties): AxsysClient {
-        val hentAnsatteCache = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .maximumSize(500)
-            .build<EnhetId, List<NavIdent>>()
-        val hentTilgangerCache = Caffeine.newBuilder()
-            .expireAfterWrite(30, TimeUnit.MINUTES)
-            .maximumSize(10000)
-            .build<NavIdent, List<AxsysEnhet>>()
-        return CachedAxsysClient(AxsysClientImpl(properties.axsysUrl), hentTilgangerCache, hentAnsatteCache)
-    }
-
-    @Bean
     fun msGraphClient(
         properties: EnvironmentProperties
     ): MsGraphClient {
         return CachedMsGraphClient(
-           MsGraphHttpClient (
+            MsGraphHttpClient(
                 properties.microsoftGraphUri
             )
         )
     }
+
     @Bean
     fun poaoTilgangClient(
         properties: EnvironmentProperties,
@@ -104,7 +85,10 @@ class ApplicationConfig {
     }
 
     @Bean
-    fun nomClient(tokenClient: AzureAdMachineToMachineTokenClient, environmentProperties: EnvironmentProperties): NomClient {
+    fun nomClient(
+        tokenClient: AzureAdMachineToMachineTokenClient,
+        environmentProperties: EnvironmentProperties
+    ): NomClient {
         if (EnvironmentUtils.isDevelopment().orElse(false)) {
             return DevNomClient()
         }

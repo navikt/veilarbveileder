@@ -1,8 +1,6 @@
 package no.nav.veilarbveileder.config
 
-import io.getunleash.DefaultUnleash
 import no.nav.common.auth.context.AuthContextHolder
-import no.nav.common.client.axsys.AxsysClient
 import no.nav.common.client.msgraph.MsGraphClient
 import no.nav.common.client.nom.NomClient
 import no.nav.common.client.nom.NomClientImpl
@@ -56,16 +54,6 @@ class ApplicationTestConfig {
     @Bean
     fun norg2Client(): Norg2Client {
         return Mockito.mock(Norg2Client::class.java)
-    }
-
-    @Bean
-    fun axsysClient(): AxsysClient {
-        return Mockito.mock(AxsysClient::class.java)
-    }
-
-    @Bean
-    fun defaultUnleash(): DefaultUnleash {
-        return Mockito.mock(DefaultUnleash::class.java)
     }
 
     @Bean
