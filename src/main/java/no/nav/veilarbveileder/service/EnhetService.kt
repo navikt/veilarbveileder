@@ -36,7 +36,8 @@ class EnhetService(
     private val azureAdOnBehalfOfTokenClient: AzureAdOnBehalfOfTokenClient,
     private val authContextHolder: AuthContextHolder,
     private val environmentProperties: EnvironmentProperties,
-    private val defaultUnleash: DefaultUnleash
+    private val defaultUnleash: DefaultUnleash,
+    private val authService: AuthService
 ) {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -67,12 +68,18 @@ class EnhetService(
             try {
                 val aktiveEnheter = norg2Client.alleAktiveEnheter()
                 val unikeEnhetTilgangerFraAxsys = hentEnheterFraAxsys(navIdent).toSet()
-                val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper().map { enhetId ->
-                    PortefoljeEnhet(
-                        enhetId = enhetId,
-                        navn = aktiveEnheter.firstOrNull { enhetId.get() == it.enhetNr }?.navn
-                    )
-                }.toSet()
+                val unikeEnhetTilgangerFraADGrupper =
+                    if (authService.erSystemBruker()) {
+                        hentEnhetTilgangerFraADGrupper(navIdent)
+                    } else {
+                        hentEnhetTilgangerFraADGrupperForInnloggetBruker()
+                    }
+                        .map { enhetId ->
+                            PortefoljeEnhet(
+                                enhetId = enhetId,
+                                navn = aktiveEnheter.firstOrNull { enhetId.get() == it.enhetNr }?.navn
+                            )
+                        }.toSet()
 
                 if (unikeEnhetTilgangerFraAxsys == unikeEnhetTilgangerFraADGrupper) {
                     logger.info("Enhettilganger er identiske mellom Axsys og AD-grupper.")
@@ -104,12 +111,24 @@ class EnhetService(
             .map { axsysEnhet: AxsysEnhet? -> Mappers.tilPortefoljeEnhet(axsysEnhet) }
     }
 
-    fun hentEnhetTilgangerFraADGrupper(): Set<EnhetId> {
+    fun hentEnhetTilgangerFraADGrupperForInnloggetBruker(): Set<EnhetId> {
         return msGraphClient.hentAdGroupsForUser(
             azureAdOnBehalfOfTokenClient.exchangeOnBehalfOfToken(
                 environmentProperties.microsoftGraphScope,
                 authContextHolder.requireIdTokenString()
             ),
+            AdGroupFilter.ENHET
+        )
+            .map { tilEnhetId(it.displayName) }
+            .toSet()
+    }
+
+    fun hentEnhetTilgangerFraADGrupper(navIdent: NavIdent): Set<EnhetId> {
+        return msGraphClient.hentAdGroupsForUser(
+            azureAdMachineToMachineTokenClient.createMachineToMachineToken(
+                environmentProperties.microsoftGraphScope
+            ),
+            navIdent.get(),
             AdGroupFilter.ENHET
         )
             .map { tilEnhetId(it.displayName) }

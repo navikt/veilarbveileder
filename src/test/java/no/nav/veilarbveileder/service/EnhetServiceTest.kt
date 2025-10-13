@@ -57,6 +57,9 @@ class EnhetServiceTest {
     @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var defaultUnleash: DefaultUnleash
 
+    @Mock(strictness = Mock.Strictness.LENIENT)
+    private lateinit var authService: AuthService
+
     private lateinit var enhetService: EnhetService
 
     companion object {
@@ -83,7 +86,8 @@ class EnhetServiceTest {
             azureAdOnBehalfOfTokenClient,
             authContextHolder,
             environmentProperties,
-            defaultUnleash
+            defaultUnleash,
+            authService
         )
     }
 
@@ -148,15 +152,38 @@ class EnhetServiceTest {
         assertEquals("B789012", result?.get(1)?.get())
     }
 
+
     @Test
-    fun `hentTilganger returnerer forventede tilganger for veileder`() {
+    fun `hentTilganger returnerer forventede tilganger for veileder - OBO-kontekst`() {
         val adGroup = AdGroupData(AzureObjectId.of(UUID.randomUUID().toString()), "${AD_GRUPPE_ENHET_PREFIKS}1234")
         val axsysEnhet = AxsysEnhet().setEnhetId(EnhetId.of("1234")).setNavn("Nav Oslo")
 
+        `when`(authService.erSystemBruker()).thenReturn(false)
         `when`(axsysClient.hentTilganger(NavIdent.of(TEST_NAV_IDENT))).thenReturn(listOf(axsysEnhet))
         `when`(
             msGraphClient.hentAdGroupsForUser(
                 TEST_SCOPED_OBO_TOKEN,
+                AdGroupFilter.ENHET
+            )
+        ).thenReturn(listOf(adGroup))
+
+        val result = enhetService.hentTilganger(NavIdent.of(TEST_NAV_IDENT))
+
+        assertEquals(1, result.size)
+        assertEquals(EnhetId.of("1234"), result[0]?.enhetId)
+    }
+
+    @Test
+    fun `hentTilganger returnerer forventede tilganger for veileder - M2M-kontekst`() {
+        val adGroup = AdGroupData(AzureObjectId.of(UUID.randomUUID().toString()), "${AD_GRUPPE_ENHET_PREFIKS}1234")
+        val axsysEnhet = AxsysEnhet().setEnhetId(EnhetId.of("1234")).setNavn("Nav Oslo")
+
+        `when`(authService.erSystemBruker()).thenReturn(true)
+        `when`(axsysClient.hentTilganger(NavIdent.of(TEST_NAV_IDENT))).thenReturn(listOf(axsysEnhet))
+        `when`(
+            msGraphClient.hentAdGroupsForUser(
+                TEST_M2M_TOKEN,
+                TEST_NAV_IDENT,
                 AdGroupFilter.ENHET
             )
         ).thenReturn(listOf(adGroup))
