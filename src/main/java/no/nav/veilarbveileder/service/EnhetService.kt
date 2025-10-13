@@ -55,7 +55,7 @@ class EnhetService(
         ).map { NavIdent.of(it.onPremisesSamAccountName) }
     }
 
-    fun hentTilganger(navIdent: NavIdent): List<PortefoljeEnhet?> {
+    fun hentTilgangerForInnloggetBruker(): List<PortefoljeEnhet?> {
         return try {
             val aktiveEnheter = norg2Client.alleAktiveEnheter()
             val unikeEnhetTilgangerFraADGrupper = hentEnhetTilgangerFraADGrupper().map { enhetId ->

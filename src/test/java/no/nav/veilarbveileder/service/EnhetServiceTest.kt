@@ -136,7 +136,7 @@ class EnhetServiceTest {
     }
 
     @Test
-    fun `hentTilganger returnerer forventede tilganger for veileder`() {
+    fun `hentTilgangerForInnloggetBruker returnerer forventede tilganger for veileder`() {
         val adGroup = AdGroupData(AzureObjectId.of(UUID.randomUUID().toString()), "${AD_GRUPPE_ENHET_PREFIKS}1234")
 
         `when`(
@@ -146,7 +146,7 @@ class EnhetServiceTest {
             )
         ).thenReturn(listOf(adGroup))
 
-        val result = enhetService.hentTilganger(NavIdent.of(TEST_NAV_IDENT))
+        val result = enhetService.hentTilgangerForInnloggetBruker()
 
         assertEquals(1, result.size)
         assertEquals(EnhetId.of("1234"), result[0]?.enhetId)

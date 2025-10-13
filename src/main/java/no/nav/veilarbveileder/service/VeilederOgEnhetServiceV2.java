@@ -26,13 +26,13 @@ public class VeilederOgEnhetServiceV2 implements VeilederOgEnhetService {
     private final VeilederService veilederService;
 
     @Override
-    public List<PortefoljeEnhet> hentEnhetListe(NavIdent navIdent) {
+    public List<PortefoljeEnhet> hentEnhetListeForInnloggetBruker(NavIdent navIdent) {
         if (authService.harModiaAdminRolle()) {
             log.info("Rollen {} ble brukt for ident: {}", ROLLE_MODIA_ADMIN, navIdent);
             return enhetService.alleEnheter();
         }
 
-        return enhetService.hentTilganger(navIdent);
+        return enhetService.hentTilgangerForInnloggetBruker();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class VeilederOgEnhetServiceV2 implements VeilederOgEnhetService {
     @Override
     public VeilederInfo hentVeilederInfo(NavIdent navIdent) {
         Veileder veileder = hentVeilederData(navIdent);
-        List<PortefoljeEnhet> veilederEnheter = hentEnhetListe(navIdent);
+        List<PortefoljeEnhet> veilederEnheter = hentEnhetListeForInnloggetBruker(navIdent);
 
         return new VeilederInfo()
                 .setIdent(veileder.getIdent())
