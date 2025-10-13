@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface VeilederOgEnhetService {
 
-    List<PortefoljeEnhet> hentEnhetListe(NavIdent navIdent);
+    List<PortefoljeEnhet> hentEnhetListeForInnloggetBruker(NavIdent navIdent);
 
     Veileder hentVeilederData(NavIdent navIdent);
 

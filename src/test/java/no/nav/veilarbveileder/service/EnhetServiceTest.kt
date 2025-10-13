@@ -1,9 +1,6 @@
 package no.nav.veilarbveileder.service
 
-import io.getunleash.DefaultUnleash
 import no.nav.common.auth.context.AuthContextHolder
-import no.nav.common.client.axsys.AxsysClient
-import no.nav.common.client.axsys.AxsysEnhet
 import no.nav.common.client.msgraph.AdGroupData
 import no.nav.common.client.msgraph.AdGroupFilter
 import no.nav.common.client.msgraph.MsGraphClient
@@ -17,7 +14,6 @@ import no.nav.common.types.identer.EnhetId
 import no.nav.common.types.identer.NavIdent
 import no.nav.veilarbveileder.config.EnvironmentProperties
 import no.nav.veilarbveileder.service.EnhetService.Companion.AD_GRUPPE_ENHET_PREFIKS
-import no.nav.veilarbveileder.utils.HENT_ENHETER_FRA_AD_OG_LOGG_DIFF
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,9 +33,6 @@ class EnhetServiceTest {
     private lateinit var norg2Client: Norg2Client
 
     @Mock(strictness = Mock.Strictness.LENIENT)
-    private lateinit var axsysClient: AxsysClient
-
-    @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var msGraphClient: MsGraphClient
 
     @Mock(strictness = Mock.Strictness.LENIENT)
@@ -54,9 +47,6 @@ class EnhetServiceTest {
     @Mock(strictness = Mock.Strictness.LENIENT)
     private lateinit var environmentProperties: EnvironmentProperties
 
-    @Mock(strictness = Mock.Strictness.LENIENT)
-    private lateinit var defaultUnleash: DefaultUnleash
-
     private lateinit var enhetService: EnhetService
 
     companion object {
@@ -68,7 +58,6 @@ class EnhetServiceTest {
 
     @BeforeEach
     fun setup() {
-        `when`(defaultUnleash.isEnabled(HENT_ENHETER_FRA_AD_OG_LOGG_DIFF)).thenReturn(true)
         `when`(azureAdMachineToMachineTokenClient.createMachineToMachineToken(any())).thenReturn(TEST_M2M_TOKEN)
         `when`(authContextHolder.requireIdTokenString()).thenReturn(TEST_OBO_TOKEN)
         `when`(azureAdOnBehalfOfTokenClient.exchangeOnBehalfOfToken(any(), eq(TEST_OBO_TOKEN))).thenReturn(
@@ -77,13 +66,11 @@ class EnhetServiceTest {
 
         enhetService = EnhetService(
             norg2Client,
-            axsysClient,
             msGraphClient,
             azureAdMachineToMachineTokenClient,
             azureAdOnBehalfOfTokenClient,
             authContextHolder,
-            environmentProperties,
-            defaultUnleash
+            environmentProperties
         )
     }
 
@@ -149,11 +136,9 @@ class EnhetServiceTest {
     }
 
     @Test
-    fun `hentTilganger returnerer forventede tilganger for veileder`() {
+    fun `hentTilgangerForInnloggetBruker returnerer forventede tilganger for veileder`() {
         val adGroup = AdGroupData(AzureObjectId.of(UUID.randomUUID().toString()), "${AD_GRUPPE_ENHET_PREFIKS}1234")
-        val axsysEnhet = AxsysEnhet().setEnhetId(EnhetId.of("1234")).setNavn("Nav Oslo")
 
-        `when`(axsysClient.hentTilganger(NavIdent.of(TEST_NAV_IDENT))).thenReturn(listOf(axsysEnhet))
         `when`(
             msGraphClient.hentAdGroupsForUser(
                 TEST_SCOPED_OBO_TOKEN,
@@ -161,7 +146,7 @@ class EnhetServiceTest {
             )
         ).thenReturn(listOf(adGroup))
 
-        val result = enhetService.hentTilganger(NavIdent.of(TEST_NAV_IDENT))
+        val result = enhetService.hentTilgangerForInnloggetBruker()
 
         assertEquals(1, result.size)
         assertEquals(EnhetId.of("1234"), result[0]?.enhetId)

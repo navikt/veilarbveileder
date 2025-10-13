@@ -36,7 +36,7 @@ public class VeilederController {
     public IdentOgEnhetliste hentEnheter() {
         authService.sjekkTilgangTilModia();
         NavIdent navIdent = authService.getInnloggetVeilederIdent();
-        List<PortefoljeEnhet> response = veilederOgEnhetService.hentEnhetListe(navIdent);
+        List<PortefoljeEnhet> response = veilederOgEnhetService.hentEnhetListeForInnloggetBruker(navIdent);
         return new IdentOgEnhetliste(navIdent, response);
     }
 
