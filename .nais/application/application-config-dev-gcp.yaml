@@ -10,6 +10,9 @@ spec:
   port: 8080
   webproxy: true
   observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
     logging:
       destinations:
         - id: elastic
