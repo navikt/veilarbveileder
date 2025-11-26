@@ -21,7 +21,7 @@
     <properties>
         <java.version>21</java.version>
         <common.version>3.2025.10.10_08.21-bb7c7830d93c</common.version>
-        <kotlin.version>2.2.20</kotlin.version>
+        <kotlin.version>2.2.21</kotlin.version>
         <unleash.version>11.1.1</unleash.version>
     </properties>
 
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -163,7 +163,7 @@
         <dependency>
             <groupId>no.nav.poao-tilgang</groupId>
             <artifactId>client</artifactId>
-            <version>2025.09.15_11.12-54be8ac278c0</version>
+            <version>2025.11.03_13.40-18456d0598be</version>
         </dependency>
 
         <dependency>
