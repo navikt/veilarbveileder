@@ -10,16 +10,13 @@ import no.nav.veilarbveileder.domain.Veileder
 import no.nav.veilarbveileder.service.EnhetService
 import no.nav.veilarbveileder.service.VeilederOgEnhetServiceV2
 import no.nav.veilarbveileder.service.VeilederService
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.assertj.MockMvcTester
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
 
 @SpringBootTest(
@@ -36,12 +33,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @EnableWebMvc
 @WireMockTest(httpPort = 8080)
 class VeilederControllerTest {
-
     @Autowired
-    lateinit var mockMvc: MockMvc
-
-    @Autowired
-    lateinit var nomClient: NomClient
+    lateinit var mockMvcTester: MockMvcTester
 
     init {
         EnvironmentConfig.setup()
@@ -54,12 +47,16 @@ class VeilederControllerTest {
             post(urlMatching("/graphql"))
                 .withRequestBody(
                     equalToJson(
-                        "{" +
-                                "  \"query\": \"query(\$identer: [String!]!) {    ressurser(where: { navIdenter: \$identer }){        id        ressurs {            navIdent            visningsNavn            fornavn            etternavn        }    }}\"," +
-                                "  \"variables\": {" +
-                                "    \"identer\": [\"$veilederIdent\"]" +
-                                "  }" +
-                                "}"
+                        (
+                            """
+                            {
+                              "query": "query(${'$'}identer: [String!]!) {    ressurser(where: { navIdenter: ${'$'}identer }){        id        ressurs {            navIdent            visningsNavn            fornavn            etternavn        }    }}",
+                              "variables": {
+                                "identer": ["$veilederIdent"]
+                              }
+                            }
+                            """
+                            ).trimIndent()
                     )
                 )
                 .willReturn(ok().withBodyFile("ressurser-enkel-response.json"))
@@ -72,13 +69,13 @@ class VeilederControllerTest {
             navn = "E1234, F1234 M1234"
         })
 
-        mockMvc.perform(
-            get("/api/veileder/{identer}", veilederIdent).accept(MediaType.APPLICATION_JSON_VALUE)
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().json(expectedResponseContent, false))
+            assertThat(mockMvcTester.get()
+                .uri("/api/veileder/{identer}", veilederIdent)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .hasStatusOk()
+                .bodyJson()
+                .isLenientlyEqualTo(expectedResponseContent)
     }
-
     @Test
     fun `skal hente info om veiledere`() {
         val veilederIdent1 = "Z1234"
@@ -87,12 +84,16 @@ class VeilederControllerTest {
             post(urlMatching("/graphql"))
                 .withRequestBody(
                     equalToJson(
-                        "{" +
-                                "  \"query\": \"query(\$identer: [String!]!) {    ressurser(where: { navIdenter: \$identer }){        id        ressurs {            navIdent            visningsNavn            fornavn            etternavn        }    }}\"," +
-                                "  \"variables\": {" +
-                                "    \"identer\": [\"$veilederIdent1\", \"$veilederIdent2\"]" +
-                                "  }" +
-                                "}"
+                        (
+                            """
+                            {
+                              "query": "query(${'$'}identer: [String!]!) {    ressurser(where: { navIdenter: ${'$'}identer }){        id        ressurs {            navIdent            visningsNavn            fornavn            etternavn        }    }}",
+                              "variables": {
+                                "identer": ["$veilederIdent1", "$veilederIdent2"]
+                              }
+                            }
+                            """
+                            ).trimIndent()
                     )
                 )
                 .willReturn(ok().withBodyFile("ressurser-flere-response.json"))
@@ -113,15 +114,15 @@ class VeilederControllerTest {
                 })
         )
 
-        mockMvc.perform(
-            post("/api/veileder/list")
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("""
-                    { "identer": ["$veilederIdent1", "$veilederIdent2"] }
-                """.trimIndent())
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().json(expectedResponseContent, false))
+        assertThat(mockMvcTester.post()
+            .uri("/api/veileder/list")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content("""
+                { "identer": ["$veilederIdent1", "$veilederIdent2"] }
+            """.trimIndent()))
+            .hasStatusOk()
+            .bodyJson()
+            .isLenientlyEqualTo(expectedResponseContent)
     }
 }
