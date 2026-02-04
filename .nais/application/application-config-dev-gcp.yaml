@@ -85,7 +85,7 @@ spec:
         - application: norg2
           namespace: org
       external:
-        - host: team-obo-unleash-api.nav.cloud.nais.io
+        - host: obo-unleash-api.nav.cloud.nais.io
   env:
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao
