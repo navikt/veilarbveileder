@@ -27,7 +27,7 @@ spec:
     enabled: true
     path: veilarbveileder/internal/prometheus
   replicas:
-    min: 1
+    min: 2
     max: 4
     cpuThresholdPercentage: 75
   resources:
