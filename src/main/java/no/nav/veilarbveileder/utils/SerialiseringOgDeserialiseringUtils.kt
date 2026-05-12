@@ -1,17 +1,13 @@
 package no.nav.veilarbveileder.utils
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.readValue
 import no.nav.common.json.JsonUtils
 import no.nav.common.rest.client.RestUtils
 import okhttp3.Response
 
-// Objectmapperen i common-java-modules har p.t ikke mulighet til å konfigureres. Vi trenger å registrere jackson-kotlin-module for at deserialisering skal fungere med kotlin.
 val objectMapper: ObjectMapper =
-    JsonUtils.getMapper().registerModule(KotlinModule.Builder().build())
+    JsonUtils.getMapper()
 
 inline fun <reified T> Response.deserializeJson(): T {
     return RestUtils.getBodyStr(this)
