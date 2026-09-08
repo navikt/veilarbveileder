@@ -23,6 +23,8 @@
         <common.version>4.2026.07.10_05.48-e9835152ffc0</common.version>
         <kotlin.version>2.3.10</kotlin.version>
         <unleash.version>12.2.2</unleash.version>
+        <!-- Midlertidig override pga Tomcat-CVE-er. Fjernes når Spring Boot henter en ny versjon -->
+        <tomcat.version>11.0.25</tomcat.version>
     </properties>
 
     <build>
