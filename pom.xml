@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.6</version>
+        <version>4.1.0</version>
         <relativePath/>
     </parent>
 
@@ -20,9 +20,9 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>4.2026.06.25_10.50-baa9d54e3cd8</common.version>
+        <common.version>4.2026.07.10_05.48-e9835152ffc0</common.version>
         <kotlin.version>2.3.10</kotlin.version>
-        <unleash.version>12.2.1</unleash.version>
+        <unleash.version>12.2.2</unleash.version>
         <!-- Midlertidig override pga Tomcat-CVE-er. Fjernes når Spring Boot henter en ny versjon -->
         <tomcat.version>11.0.25</tomcat.version>
     </properties>
@@ -165,7 +165,7 @@
         <dependency>
             <groupId>no.nav.poao-tilgang</groupId>
             <artifactId>client</artifactId>
-            <version>2025.11.03_13.40-18456d0598be</version>
+            <version>2026.05.05_13.02-76cbce4f654a</version>
         </dependency>
 
         <dependency>
