@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
         <relativePath/>
     </parent>
 
@@ -21,8 +21,8 @@
     <properties>
         <java.version>21</java.version>
         <common.version>4.2026.07.10_05.48-e9835152ffc0</common.version>
-        <kotlin.version>2.3.10</kotlin.version>
-        <unleash.version>12.2.2</unleash.version>
+        <kotlin.version>2.4.20</kotlin.version>
+        <unleash.version>12.3.0</unleash.version>
         <!-- Midlertidig override pga Tomcat-CVE-er. Fjernes når Spring Boot henter en ny versjon -->
         <tomcat.version>11.0.25</tomcat.version>
     </properties>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-            <version>3.2.4</version>
+            <version>3.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -177,7 +177,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.46</version>
+            <version>1.18.48</version>
             <optional>true</optional>
         </dependency>
         <dependency>
