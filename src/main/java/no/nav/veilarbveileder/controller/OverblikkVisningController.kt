@@ -23,12 +23,15 @@ class OverblikkVisningController(
 ) {
 
     @GetMapping
-    fun hent(): OverblikkVisningResponse =
-        OverblikkVisningResponse(overblikkVisningService.hent(authService.innloggetVeilederIdent))
+    fun hent(): OverblikkVisningResponse {
+        authService.sjekkTilgangTilModia()
+        return OverblikkVisningResponse(overblikkVisningService.hent(authService.innloggetVeilederIdent))
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun lagre(@RequestBody request: OverblikkVisningRequest) {
+        authService.sjekkTilgangTilModia()
         try {
             overblikkVisningService.lagre(authService.innloggetVeilederIdent, request.overblikkVisning)
         } catch (e: IllegalArgumentException) {
@@ -38,5 +41,8 @@ class OverblikkVisningController(
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun slett() = overblikkVisningService.slett(authService.innloggetVeilederIdent)
+    fun slett() {
+        authService.sjekkTilgangTilModia()
+        overblikkVisningService.slett(authService.innloggetVeilederIdent)
+    }
 }

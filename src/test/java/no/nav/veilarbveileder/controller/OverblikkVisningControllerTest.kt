@@ -10,6 +10,8 @@ import no.nav.veilarbveileder.service.OverblikkVisningService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.doThrow
+import org.mockito.Mockito.reset
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -21,6 +23,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.assertj.MockMvcTester
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
+import org.springframework.web.server.ResponseStatusException
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
@@ -54,6 +57,7 @@ class OverblikkVisningControllerTest {
     @BeforeEach
     fun setup() {
         jdbcClient.sql("TRUNCATE OVERBLIKK_VISNING").update()
+        reset(authService)
         `when`(authService.innloggetVeilederIdent).thenReturn(NavIdent.of(VEILEDER_IDENT))
     }
 
@@ -128,6 +132,15 @@ class OverblikkVisningControllerTest {
     fun `skal returnere feilmelding dersom input data er ulovlig`() {
         assertThat(lagreOverblikkVisning("""{"overblikkVisning":["FØØ","BÅR"]}"""))
             .hasStatus(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `skal returnere 403 dersom veileder ikke har tilgang til Modia`() {
+        doThrow(ResponseStatusException(HttpStatus.FORBIDDEN)).`when`(authService).sjekkTilgangTilModia()
+
+        assertThat(hentOverblikkVisning()).hasStatus(HttpStatus.FORBIDDEN)
+        assertThat(lagreOverblikkVisning("""{"overblikkVisning":["CV"]}""")).hasStatus(HttpStatus.FORBIDDEN)
+        assertThat(slettOverblikkVisning()).hasStatus(HttpStatus.FORBIDDEN)
     }
 
     private fun hentOverblikkVisning() = mockMvcTester.get()
