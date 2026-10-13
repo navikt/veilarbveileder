@@ -4,7 +4,9 @@ import no.nav.common.types.identer.NavIdent
 import no.nav.veilarbveileder.config.ApplicationTestConfig
 import no.nav.veilarbveileder.config.DatabaseConfig
 import no.nav.veilarbveileder.config.EnvironmentConfig
+import no.nav.veilarbveileder.repository.OverblikkVisningRepository
 import no.nav.veilarbveileder.service.AuthService
+import no.nav.veilarbveileder.service.OverblikkVisningService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,7 +28,10 @@ import java.sql.DriverManager
 @SpringBootTest(
     classes = [
         ApplicationTestConfig::class,
-        DatabaseConfig::class
+        DatabaseConfig::class,
+        OverblikkVisningController::class,
+        OverblikkVisningService::class,
+        OverblikkVisningRepository::class
     ]
 )
 @AutoConfigureMockMvc
