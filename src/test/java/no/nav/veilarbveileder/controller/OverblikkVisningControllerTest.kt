@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.jdbc.core.simple.JdbcClient
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.assertj.MockMvcTester
@@ -23,7 +24,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
-import java.sql.DriverManager
 
 @SpringBootTest(
     classes = [
@@ -44,15 +44,16 @@ class OverblikkVisningControllerTest {
     @Autowired
     lateinit var authService: AuthService
 
+    @Autowired
+    lateinit var jdbcClient: JdbcClient
+
     init {
         EnvironmentConfig.setup()
     }
 
     @BeforeEach
     fun setup() {
-        DriverManager.getConnection(postgres.jdbcUrl, postgres.username, postgres.password).use {
-            it.createStatement().execute("TRUNCATE OVERBLIKK_VISNING")
-        }
+        jdbcClient.sql("TRUNCATE OVERBLIKK_VISNING").update()
         `when`(authService.innloggetVeilederIdent).thenReturn(NavIdent.of(VEILEDER_IDENT))
     }
 
