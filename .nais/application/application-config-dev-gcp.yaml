@@ -17,6 +17,13 @@ spec:
       destinations:
         - id: elastic
         - id: loki
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_18
+        tier: db-custom-1-3840
+        databases:
+          - name: veilarbveileder
+            envVarPrefix: DB
   liveness:
     path: veilarbveileder/internal/isAlive
     initialDelay: 30
