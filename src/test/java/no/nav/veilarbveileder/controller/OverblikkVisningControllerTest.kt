@@ -87,6 +87,7 @@ class OverblikkVisningControllerTest {
     fun `skal lagre ny overblikkvisning`() {
         assertThat(lagreOverblikkVisning("""{"overblikkVisning":["CV","Personalia"]}"""))
             .hasStatus(HttpStatus.NO_CONTENT)
+        assertThat(hentOverblikkVisningId().version()).isEqualTo(7)
 
         assertThat(hentOverblikkVisning())
             .bodyJson()
@@ -98,6 +99,7 @@ class OverblikkVisningControllerTest {
     @Test
     fun `skal overskrive overblikkvisning dersom overblikkvisning eksisterer`() {
         lagreOverblikkVisning("""{"overblikkVisning":["CV","Personalia"]}""")
+        val idFoerOppdatering = hentOverblikkVisningId()
         lagreOverblikkVisning("""{"overblikkVisning":["CV"]}""")
 
         assertThat(hentOverblikkVisning())
@@ -106,6 +108,7 @@ class OverblikkVisningControllerTest {
             .extractingPath("$.overblikkVisning")
             .asArray()
             .containsExactly("CV")
+        assertThat(hentOverblikkVisningId()).isEqualTo(idFoerOppdatering)
     }
 
     @Test
@@ -159,6 +162,12 @@ class OverblikkVisningControllerTest {
         .uri(URL)
         .accept(MediaType.APPLICATION_JSON)
         .exchange()
+
+    private fun hentOverblikkVisningId() = jdbcClient
+        .sql("SELECT OVERBLIKK_VISNING_ID FROM OVERBLIKK_VISNING WHERE VEILEDER_ID = :veilederId")
+        .param("veilederId", VEILEDER_IDENT)
+        .query { rs, _ -> rs.getObject("OVERBLIKK_VISNING_ID", java.util.UUID::class.java) }
+        .single()
 
     companion object {
         private const val URL = "/api/overblikkvisning"

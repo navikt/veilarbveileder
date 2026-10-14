@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service
 @Service
 class OverblikkVisningService(private val overblikkVisningRepository: OverblikkVisningRepository) {
 
-    fun hent(veilederId: NavIdent): List<String> = overblikkVisningRepository.hent(veilederId).orEmpty()
+    fun hent(veilederId: NavIdent): List<String> =
+        overblikkVisningRepository.hent(veilederId)?.visning.orEmpty()
 
     fun lagre(veilederId: NavIdent, visning: List<String>) {
         require(visning.all(OverblikkVisningAlternativ::erGyldig)) { "Ugyldige verdier i overblikkvisning: $visning" }
