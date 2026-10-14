@@ -10,11 +10,13 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 class DatabaseConfigTest {
     @Test
     fun `runs database migrations`() {
-        val migrationResult = DatabaseConfig()
-            .flyway(postgres.jdbcUrl, postgres.username, postgres.password)
-            .migrate()
+        val databaseConfig = DatabaseConfig()
 
-        assertThat(migrationResult.success).isTrue()
+        databaseConfig.dataSource(postgres.jdbcUrl, postgres.username, postgres.password).use { dataSource ->
+            val migrationResult = databaseConfig.flyway(dataSource).migrate()
+
+            assertThat(migrationResult.success).isTrue()
+        }
     }
 
     companion object {
