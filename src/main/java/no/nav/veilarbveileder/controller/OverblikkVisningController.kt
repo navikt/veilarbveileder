@@ -1,5 +1,7 @@
 package no.nav.veilarbveileder.controller
 
+import jakarta.validation.Valid
+import no.nav.veilarbveileder.controller.dto.OverblikkVisningDtoMapper
 import no.nav.veilarbveileder.controller.dto.OverblikkVisningRequest
 import no.nav.veilarbveileder.controller.dto.OverblikkVisningResponse
 import no.nav.veilarbveileder.service.AuthService
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/overblikkvisning", produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -25,18 +26,14 @@ class OverblikkVisningController(
     @GetMapping
     fun hent(): OverblikkVisningResponse {
         authService.sjekkTilgangTilModia()
-        return OverblikkVisningResponse(overblikkVisningService.hent(authService.innloggetVeilederIdent))
+        return OverblikkVisningDtoMapper.tilRespons(overblikkVisningService.hent(authService.innloggetVeilederIdent))
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun lagre(@RequestBody request: OverblikkVisningRequest) {
+    fun lagre(@Valid @RequestBody request: OverblikkVisningRequest) {
         authService.sjekkTilgangTilModia()
-        try {
-            overblikkVisningService.lagre(authService.innloggetVeilederIdent, request.overblikkVisning)
-        } catch (e: IllegalArgumentException) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message, e)
-        }
+        overblikkVisningService.lagre(authService.innloggetVeilederIdent, OverblikkVisningDtoMapper.tilDomene(request))
     }
 
     @DeleteMapping

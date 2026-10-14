@@ -10,6 +10,8 @@ import no.nav.veilarbveileder.service.OverblikkVisningService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.reset
 import org.mockito.Mockito.`when`
@@ -137,6 +139,112 @@ class OverblikkVisningControllerTest {
             .hasStatus(HttpStatus.BAD_REQUEST)
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "CV", "Jobbønsker", "Oppfølging", "Personalia", "Registrering", "Ytelser"
+    ])
+    fun `skal godta hvert lovlige valg i kontrakten`(valg: String) {
+        assertThat(lagreOverblikkVisning("""{"overblikkVisning":["$valg"]}"""))
+            .hasStatus(HttpStatus.NO_CONTENT)
+        assertThat(hentOverblikkVisning())
+            .bodyJson()
+            .extractingPath("$.overblikkVisning")
+            .asArray()
+            .containsExactly(valg)
+        assertThat(hentLagredeValg()).containsExactly(valg.uppercase())
+
+        assertThat(lagreOverblikkVisning("""{"overblikkVisning":["CV","$valg"]}"""))
+            .hasStatus(HttpStatus.NO_CONTENT)
+        assertThat(hentLagredeValg()).containsExactly("CV", valg.uppercase())
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [
+        """{"overblikkVisning":["cv"]}""",
+        """{"overblikkVisning":["JOBBØNSKER"]}""",
+        """{"overblikkVisning":["OPPFØLGING"]}""",
+        """{"overblikkVisning":["PERSONALIA"]}""",
+        """{"overblikkVisning":["REGISTRERING"]}""",
+        """{"overblikkVisning":["YTELSER"]}""",
+        """{"overblikkVisning":["personalia"]}""",
+        """{"overblikkVisning":["PeRsOnAlIa"]}""",
+        """{"overblikkVisning":["Jobbønsker "]}""",
+        """{"overblikkVisning":["CV","ukjent"]}""",
+        """{"overblikkVisning":[""]}""",
+        """{"overblikkVisning":[null]}""",
+        """{"overblikkVisning":null}""",
+        """{}"""
+    ])
+    fun `skal avvise ugyldige foresporsler uten aa endre lagrede valg`(json: String) {
+        assertThat(lagreOverblikkVisning("""{"overblikkVisning":["CV"]}"""))
+            .hasStatus(HttpStatus.NO_CONTENT)
+
+        assertThat(lagreOverblikkVisning(json)).hasStatus(HttpStatus.BAD_REQUEST)
+
+        assertThat(hentOverblikkVisning())
+            .bodyJson()
+            .extractingPath("$.overblikkVisning")
+            .asArray()
+            .containsExactly("CV")
+    }
+
+    @Test
+    fun `skal godta alle lovlige valg og en tom liste`() {
+        val valg = """["CV","Jobbønsker","Oppfølging","Personalia","Registrering","Ytelser"]"""
+        assertThat(lagreOverblikkVisning("""{"overblikkVisning":$valg}"""))
+            .hasStatus(HttpStatus.NO_CONTENT)
+        assertThat(hentLagredeValg())
+            .containsExactly("CV", "JOBBØNSKER", "OPPFØLGING", "PERSONALIA", "REGISTRERING", "YTELSER")
+        assertThat(hentOverblikkVisning())
+            .bodyJson()
+            .extractingPath("$.overblikkVisning")
+            .asArray()
+            .containsExactly("CV", "Jobbønsker", "Oppfølging", "Personalia", "Registrering", "Ytelser")
+
+        assertThat(lagreOverblikkVisning("""{"overblikkVisning":[]}"""))
+            .hasStatus(HttpStatus.NO_CONTENT)
+        assertThat(hentLagredeValg()).isEmpty()
+        assertThat(hentOverblikkVisning())
+            .bodyJson()
+            .extractingPath("$.overblikkVisning")
+            .asArray()
+            .isEmpty()
+    }
+
+    @Test
+    fun `skal lese eksisterende store bokstaver fra databasen med dagens responsformat`() {
+        jdbcClient.sql("INSERT INTO OVERBLIKK_VISNING (VEILEDER_ID, VISNING) VALUES (:ident, :visning)")
+            .param("ident", VEILEDER_IDENT)
+            .param("visning", arrayOf("CV", "JOBBØNSKER", "OPPFØLGING", "PERSONALIA", "REGISTRERING", "YTELSER"))
+            .update()
+
+        assertThat(hentOverblikkVisning())
+            .hasStatusOk()
+            .bodyJson()
+            .extractingPath("$.overblikkVisning")
+            .asArray()
+            .containsExactly("CV", "Jobbønsker", "Oppfølging", "Personalia", "Registrering", "Ytelser")
+    }
+
+    @Test
+    fun `skal fortsatt lese tidligere lagrede valg og bruke store bokstaver ved oppdatering`() {
+        jdbcClient.sql("INSERT INTO OVERBLIKK_VISNING (VEILEDER_ID, VISNING) VALUES (:ident, :visning)")
+            .param("ident", VEILEDER_IDENT)
+            .param("visning", arrayOf("CV", "Personalia"))
+            .update()
+
+        assertThat(hentOverblikkVisning())
+            .hasStatusOk()
+            .bodyJson()
+            .extractingPath("$.overblikkVisning")
+            .asArray()
+            .containsExactly("CV", "Personalia")
+
+        assertThat(lagreOverblikkVisning("""{"overblikkVisning":["Personalia"]}"""))
+            .hasStatus(HttpStatus.NO_CONTENT)
+        assertThat(hentLagredeValg()).containsExactly("PERSONALIA")
+    }
+
     @Test
     fun `skal returnere 403 dersom veileder ikke har tilgang til Modia`() {
         doThrow(ResponseStatusException(HttpStatus.FORBIDDEN)).`when`(authService).sjekkTilgangTilModia()
@@ -162,6 +270,12 @@ class OverblikkVisningControllerTest {
         .uri(URL)
         .accept(MediaType.APPLICATION_JSON)
         .exchange()
+
+    private fun hentLagredeValg(): List<String> = jdbcClient
+        .sql("SELECT VISNING FROM OVERBLIKK_VISNING WHERE VEILEDER_ID = :veilederId")
+        .param("veilederId", VEILEDER_IDENT)
+        .query { rs, _ -> (rs.getArray("VISNING").array as Array<*>).map { it as String } }
+        .single()
 
     private fun hentOverblikkVisningId() = jdbcClient
         .sql("SELECT OVERBLIKK_VISNING_ID FROM OVERBLIKK_VISNING WHERE VEILEDER_ID = :veilederId")

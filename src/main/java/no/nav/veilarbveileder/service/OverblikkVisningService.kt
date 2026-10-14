@@ -9,12 +9,11 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class OverblikkVisningService(private val overblikkVisningRepository: OverblikkVisningRepository) {
 
-    fun hent(veilederId: NavIdent): List<String> =
+    fun hent(veilederId: NavIdent): List<OverblikkVisningAlternativ> =
         overblikkVisningRepository.hent(veilederId)?.visning.orEmpty()
 
     @Transactional
-    fun lagre(veilederId: NavIdent, visning: List<String>) {
-        require(visning.all(OverblikkVisningAlternativ::erGyldig)) { "Ugyldige verdier i overblikkvisning: $visning" }
+    fun lagre(veilederId: NavIdent, visning: List<OverblikkVisningAlternativ>) {
         overblikkVisningRepository.lagre(veilederId, visning)
     }
 

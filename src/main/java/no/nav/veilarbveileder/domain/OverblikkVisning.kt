@@ -4,5 +4,14 @@ import java.util.UUID
 
 data class OverblikkVisning(
     val id: UUID,
-    val visning: List<String>
+    val visning: List<OverblikkVisningAlternativ>
 )
+
+enum class OverblikkVisningAlternativ {
+    CV,
+    JOBBØNSKER,
+    OPPFØLGING,
+    PERSONALIA,
+    REGISTRERING,
+    YTELSER
+}

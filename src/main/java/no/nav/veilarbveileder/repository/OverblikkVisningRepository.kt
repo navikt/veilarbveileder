@@ -2,6 +2,7 @@ package no.nav.veilarbveileder.repository
 
 import no.nav.common.types.identer.NavIdent
 import no.nav.veilarbveileder.domain.OverblikkVisning
+import no.nav.veilarbveileder.domain.OverblikkVisningAlternativ
 import org.springframework.jdbc.core.simple.JdbcClient
 import org.springframework.stereotype.Repository
 import java.util.UUID
@@ -13,15 +14,18 @@ class OverblikkVisningRepository(private val jdbcClient: JdbcClient) {
         .sql("SELECT OVERBLIKK_VISNING_ID, VISNING FROM OVERBLIKK_VISNING WHERE VEILEDER_ID = :veilederId")
         .param("veilederId", veilederId.get())
         .query { rs, _ ->
-            OverblikkVisning(
+            val databaseVisning = OverblikkVisningDb(
                 id = rs.getObject("OVERBLIKK_VISNING_ID", UUID::class.java),
-                visning = (rs.getArray("VISNING").array as Array<*>).map { it as String }
+                visning = (rs.getArray("VISNING").array as Array<*>)
+                    .map { OverblikkVisningAlternativDb.fraVerdi(it as String) }
             )
+            OverblikkVisningDbMapper.tilDomene(databaseVisning)
         }
         .optional()
         .orElse(null)
 
-    fun lagre(veilederId: NavIdent, visning: List<String>) {
+    fun lagre(veilederId: NavIdent, visning: List<OverblikkVisningAlternativ>) {
+        val databaseVisning = visning.map { OverblikkVisningDbMapper.tilDb(it).name }.toTypedArray()
         val eksisterendeVisning = hent(veilederId)
         if (eksisterendeVisning != null) {
             jdbcClient
@@ -33,13 +37,13 @@ class OverblikkVisningRepository(private val jdbcClient: JdbcClient) {
                     """.trimIndent()
                 )
                 .param("id", eksisterendeVisning.id)
-                .param("visning", visning.toTypedArray())
+                .param("visning", databaseVisning)
                 .update()
         } else {
             jdbcClient
                 .sql("INSERT INTO OVERBLIKK_VISNING (VEILEDER_ID, VISNING) VALUES (:veilederId, :visning)")
                 .param("veilederId", veilederId.get())
-                .param("visning", visning.toTypedArray())
+                .param("visning", databaseVisning)
                 .update()
         }
     }
