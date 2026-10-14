@@ -5,6 +5,10 @@ import no.nav.veilarbveileder.config.ApplicationTestConfig
 import no.nav.veilarbveileder.config.DatabaseConfig
 import no.nav.veilarbveileder.config.EnvironmentConfig
 import no.nav.veilarbveileder.repository.OverblikkVisningRepository
+import no.nav.veilarbveileder.repository.OverblikkVisningTabell.ID
+import no.nav.veilarbveileder.repository.OverblikkVisningTabell.NAVN
+import no.nav.veilarbveileder.repository.OverblikkVisningTabell.VEILEDER_ID
+import no.nav.veilarbveileder.repository.OverblikkVisningTabell.VISNING
 import no.nav.veilarbveileder.service.AuthService
 import no.nav.veilarbveileder.service.OverblikkVisningService
 import org.assertj.core.api.Assertions.assertThat
@@ -58,7 +62,7 @@ class OverblikkVisningControllerTest {
 
     @BeforeEach
     fun setup() {
-        jdbcClient.sql("TRUNCATE OVERBLIKK_VISNING").update()
+        jdbcClient.sql("TRUNCATE $NAVN").update()
         reset(authService)
         `when`(authService.innloggetVeilederIdent).thenReturn(NavIdent.of(VEILEDER_IDENT))
     }
@@ -213,7 +217,7 @@ class OverblikkVisningControllerTest {
 
     @Test
     fun `skal lese eksisterende store bokstaver fra databasen med dagens responsformat`() {
-        jdbcClient.sql("INSERT INTO OVERBLIKK_VISNING (VEILEDER_ID, VISNING) VALUES (:ident, :visning)")
+        jdbcClient.sql("INSERT INTO $NAVN ($VEILEDER_ID, $VISNING) VALUES (:ident, :visning)")
             .param("ident", VEILEDER_IDENT)
             .param("visning", arrayOf("CV", "JOBBØNSKER", "OPPFØLGING", "PERSONALIA", "REGISTRERING", "YTELSER"))
             .update()
@@ -224,25 +228,6 @@ class OverblikkVisningControllerTest {
             .extractingPath("$.overblikkVisning")
             .asArray()
             .containsExactly("CV", "Jobbønsker", "Oppfølging", "Personalia", "Registrering", "Ytelser")
-    }
-
-    @Test
-    fun `skal fortsatt lese tidligere lagrede valg og bruke store bokstaver ved oppdatering`() {
-        jdbcClient.sql("INSERT INTO OVERBLIKK_VISNING (VEILEDER_ID, VISNING) VALUES (:ident, :visning)")
-            .param("ident", VEILEDER_IDENT)
-            .param("visning", arrayOf("CV", "Personalia"))
-            .update()
-
-        assertThat(hentOverblikkVisning())
-            .hasStatusOk()
-            .bodyJson()
-            .extractingPath("$.overblikkVisning")
-            .asArray()
-            .containsExactly("CV", "Personalia")
-
-        assertThat(lagreOverblikkVisning("""{"overblikkVisning":["Personalia"]}"""))
-            .hasStatus(HttpStatus.NO_CONTENT)
-        assertThat(hentLagredeValg()).containsExactly("PERSONALIA")
     }
 
     @Test
@@ -272,15 +257,15 @@ class OverblikkVisningControllerTest {
         .exchange()
 
     private fun hentLagredeValg(): List<String> = jdbcClient
-        .sql("SELECT VISNING FROM OVERBLIKK_VISNING WHERE VEILEDER_ID = :veilederId")
+        .sql("SELECT $VISNING FROM $NAVN WHERE $VEILEDER_ID = :veilederId")
         .param("veilederId", VEILEDER_IDENT)
-        .query { rs, _ -> (rs.getArray("VISNING").array as Array<*>).map { it as String } }
+        .query { rs, _ -> (rs.getArray(VISNING).array as Array<*>).map { it as String } }
         .single()
 
     private fun hentOverblikkVisningId() = jdbcClient
-        .sql("SELECT OVERBLIKK_VISNING_ID FROM OVERBLIKK_VISNING WHERE VEILEDER_ID = :veilederId")
+        .sql("SELECT $ID FROM $NAVN WHERE $VEILEDER_ID = :veilederId")
         .param("veilederId", VEILEDER_IDENT)
-        .query { rs, _ -> rs.getObject("OVERBLIKK_VISNING_ID", java.util.UUID::class.java) }
+        .query { rs, _ -> rs.getObject(ID, java.util.UUID::class.java) }
         .single()
 
     companion object {

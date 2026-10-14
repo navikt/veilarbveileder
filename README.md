@@ -14,8 +14,8 @@ typer som oversettes til og fra domenetypene. Domenetypene har ingen
 JSON-annotasjoner eller kjennskap til databaseformatet. Internt og ved lagring brukes
 `CV`, `JOBBØNSKER`, `OPPFØLGING`, `PERSONALIA`, `REGISTRERING` og `YTELSER`.
 Responsen bruker samme skrivemåte som forespørselen, for eksempel `Personalia`.
-Tidligere lagrede verdier med denne skrivemåten kan fortsatt leses; ved neste
-oppdatering lagres de med store bokstaver.
+Ved migrering må verdiene omgjøres til store bokstaver før innsetting.
+Databaselaget godtar bare dette formatet.
 
 # Henvendelser
 

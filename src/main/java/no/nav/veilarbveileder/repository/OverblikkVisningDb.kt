@@ -4,26 +4,27 @@ import no.nav.veilarbveileder.domain.OverblikkVisning
 import no.nav.veilarbveileder.domain.OverblikkVisningAlternativ
 import java.util.UUID
 
+internal object OverblikkVisningTabell {
+    const val NAVN = "OVERBLIKK_VISNING"
+    const val ID = "OVERBLIKK_VISNING_ID"
+    const val VEILEDER_ID = "VEILEDER_ID"
+    const val VISNING = "VISNING"
+    const val OPPRETTET_TIDSPUNKT = "OPPRETTET_TIDSPUNKT"
+    const val SIST_ENDRET_TIDSPUNKT = "SIST_ENDRET_TIDSPUNKT"
+}
+
 internal data class OverblikkVisningDb(
     val id: UUID,
     val visning: List<OverblikkVisningAlternativDb>
 )
 
-internal enum class OverblikkVisningAlternativDb(
-    private val tidligereVerdi: String
-) {
-    CV("CV"),
-    JOBBØNSKER("Jobbønsker"),
-    OPPFØLGING("Oppfølging"),
-    PERSONALIA("Personalia"),
-    REGISTRERING("Registrering"),
-    YTELSER("Ytelser");
-
-    companion object {
-        fun fraVerdi(verdi: String): OverblikkVisningAlternativDb =
-            entries.firstOrNull { it.name == verdi || it.tidligereVerdi == verdi }
-                ?: throw IllegalArgumentException("Ugyldig overblikkvisning i databasen: $verdi")
-    }
+internal enum class OverblikkVisningAlternativDb {
+    CV,
+    JOBBØNSKER,
+    OPPFØLGING,
+    PERSONALIA,
+    REGISTRERING,
+    YTELSER
 }
 
 internal object OverblikkVisningDbMapper {
