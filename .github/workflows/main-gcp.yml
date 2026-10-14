@@ -50,10 +50,28 @@ jobs:
         with:
           team: obo
 
+  deploy-dev:
+    name: Deploy application to dev-gcp
+    if: github.ref == 'refs/heads/main'
+    needs: test-build-and-push
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Deploy application
+        uses: nais/deploy/actions/deploy@v3
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/application/application-config-dev-gcp.yaml
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}
+
   deploy-prod:
     name: Deploy application to prod-gcp
     if: github.ref == 'refs/heads/main'
-    needs: test-build-and-push
+    needs: [test-build-and-push, deploy-dev]
     permissions:
       contents: write  # Create release
       id-token: write
