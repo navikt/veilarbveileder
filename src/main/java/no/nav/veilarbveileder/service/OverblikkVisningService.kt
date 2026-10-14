@@ -4,6 +4,7 @@ import no.nav.common.types.identer.NavIdent
 import no.nav.veilarbveileder.domain.OverblikkVisningAlternativ
 import no.nav.veilarbveileder.repository.OverblikkVisningRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OverblikkVisningService(private val overblikkVisningRepository: OverblikkVisningRepository) {
@@ -11,6 +12,7 @@ class OverblikkVisningService(private val overblikkVisningRepository: OverblikkV
     fun hent(veilederId: NavIdent): List<String> =
         overblikkVisningRepository.hent(veilederId)?.visning.orEmpty()
 
+    @Transactional
     fun lagre(veilederId: NavIdent, visning: List<String>) {
         require(visning.all(OverblikkVisningAlternativ::erGyldig)) { "Ugyldige verdier i overblikkvisning: $visning" }
         overblikkVisningRepository.lagre(veilederId, visning)
