@@ -59,9 +59,6 @@ spec:
         - application: veilarbportefoljeflatefs
           namespace: obo
           cluster: dev-gcp
-        - application: veilarbfilter
-          namespace: obo
-          cluster: dev-gcp
         - application: veilarbportefolje
           namespace: obo
           cluster: dev-gcp
