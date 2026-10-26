@@ -1,5 +1,7 @@
 name: Build, push and deploy til GCP
-on: push
+on: 
+  push:
+  workflow_dispatch: 
 env:
   IMAGE_TAG: ${{ github.sha }}
   PRINT_PAYLOAD: true
