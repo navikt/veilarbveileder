@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.1</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
 
@@ -22,7 +22,7 @@
         <java.version>21</java.version>
         <common.version>4.2026.10.19_05.55-7add0b457c1d</common.version>
         <kotlin.version>2.4.21</kotlin.version>
-        <unleash.version>12.3.0</unleash.version>
+        <unleash.version>12.3.1</unleash.version>
         <!-- Midlertidig override pga Tomcat-CVE-er. Fjernes når Spring Boot henter en ny versjon -->
         <tomcat.version>11.0.25</tomcat.version>
     </properties>
