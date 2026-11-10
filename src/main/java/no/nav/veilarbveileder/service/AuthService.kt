@@ -32,6 +32,7 @@ class AuthService(
     fun erSystemBruker(): Boolean {
         return authContextHolder.erSystemBruker()
     }
+
     fun hentInnloggetVeilederUUID(): UUID =
         authContextHolder
             .idTokenClaims.flatMap { authContextHolder.getStringClaim(it, "oid") }
@@ -39,8 +40,10 @@ class AuthService(
             .orElseThrow { ResponseStatusException(HttpStatus.FORBIDDEN, "Fant ikke oid for innlogget veileder") }
 
     fun sjekkTilgangTilModia() {
-        val tilgangResult = poaoTilgangClient.evaluatePolicy(NavAnsattTilgangTilModiaPolicyInput(
-            hentInnloggetVeilederUUID())
+        val tilgangResult = poaoTilgangClient.evaluatePolicy(
+            NavAnsattTilgangTilModiaPolicyInput(
+                hentInnloggetVeilederUUID()
+            )
         ).getOrThrow()
         if (tilgangResult.isDeny) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til modia")
@@ -98,7 +101,7 @@ class AuthService(
 
     companion object {
         const val ROLLE_MODIA_ADMIN = "0000-GA-Modia_Admin"
-        val ACCEPTLIST_AZURE_SYSTEM_USERS = listOf("veilarbfilter", "veilarbportefolje","veilarbvedtaksstotte")
+        val ACCEPTLIST_AZURE_SYSTEM_USERS = listOf("veilarbportefolje", "veilarbvedtaksstotte")
         private fun getStringClaimOrEmpty(claims: JWTClaimsSet, claimName: String): Optional<String> {
             return try {
                 Optional.ofNullable(claims.getStringClaim(claimName))

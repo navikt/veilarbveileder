@@ -1,5 +1,7 @@
 name: Build, push and deploy til GCP
-on: push
+on: 
+  push:
+  workflow_dispatch: 
 env:
   IMAGE_TAG: ${{ github.sha }}
   PRINT_PAYLOAD: true
@@ -13,7 +15,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Set up Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: 21
           distribution: temurin
@@ -35,7 +37,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Set up Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: 21
           distribution: temurin
@@ -50,10 +52,28 @@ jobs:
         with:
           team: obo
 
+  deploy-dev:
+    name: Deploy application to dev-gcp
+    if: github.ref == 'refs/heads/main'
+    needs: test-build-and-push
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Deploy application
+        uses: nais/deploy/actions/deploy@v3
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/application/application-config-dev-gcp.yaml
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}
+
   deploy-prod:
     name: Deploy application to prod-gcp
     if: github.ref == 'refs/heads/main'
-    needs: test-build-and-push
+    needs: [test-build-and-push, deploy-dev]
     permissions:
       contents: write  # Create release
       id-token: write
@@ -63,7 +83,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Deploy application
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@v3
         env:
           CLUSTER: prod-gcp
           RESOURCE: .nais/application/application-config-prod-gcp.yaml
